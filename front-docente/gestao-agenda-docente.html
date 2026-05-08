@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visão Mensal - Docente</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+        .day-cell {
+            min-height: 130px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <nav class="bg-blue-900 text-white p-4 shadow-md">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="text-xl font-bold tracking-tight">
+                <i class="fas fa-chalkboard-teacher mr-2"></i> InovaTec | Painel do Docente
+            </div>
+            <div class="flex items-center space-x-6">
+                <div class="hidden md:flex space-x-4 text-sm font-medium">
+                    <a href="dashboard-docente.html" class="hover:text-blue-200 transition">Dashboard</a>
+                    <a href="gestao-agenda-docente.html" class="text-blue-200 border-b-2 border-blue-200">Visão Mensal</a>
+                    <a href="cadastro-disponibilidade-docente.html" class="hover:text-blue-200 transition">Configurar Horários</a>
+                </div>
+                <div class="bg-blue-800 px-3 py-1.5 rounded-lg flex items-center space-x-2 cursor-pointer">
+                    <i class="fas fa-user-circle"></i>
+                    <span class="text-sm">Rafa (Docente)</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto mt-8 px-4 mb-12">
+
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Abril 2026</h1>
+                <p class="text-gray-500">Você tem 12 atendimentos confirmados este mês.</p>
+            </div>
+
+            <div class="flex items-center bg-white rounded-lg shadow-sm border border-gray-200 p-1">
+                <button class="p-2 hover:bg-gray-100 rounded-md transition text-gray-600"><i class="fas fa-chevron-left"></i></button>
+                <button class="px-4 py-2 text-sm font-semibold hover:bg-gray-50 transition border-x border-gray-100">Hoje</button>
+                <button class="p-2 hover:bg-gray-100 rounded-md transition text-gray-600"><i class="fas fa-chevron-right"></i></button>
+            </div>
+
+            <div class="flex gap-2">
+                <div class="flex items-center space-x-2 text-xs bg-white border px-3 py-2 rounded-lg">
+                    <span class="w-2.5 h-2.5 bg-blue-500 rounded-sm"></span>
+                    <span class="text-gray-600">Agendado</span>
+                </div>
+                <div class="flex items-center space-x-2 text-xs bg-white border px-3 py-2 rounded-lg">
+                    <span class="w-2.5 h-2.5 bg-emerald-500 rounded-sm"></span>
+                    <span class="text-gray-600">Vago</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <!-- Header dias da semana -->
+            <div class="calendar-grid bg-gray-50 border-b border-gray-200">
+                <div class="py-3 text-center text-xs font-bold text-gray-400 uppercase tracking-wider">Dom</div>
+                <div class="py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Seg</div>
+                <div class="py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Ter</div>
+                <div class="py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Qua</div>
+                <div class="py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Qui</div>
+                <div class="py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Sex</div>
+                <div class="py-3 text-center text-xs font-bold text-gray-400 uppercase tracking-wider">Sáb</div>
+            </div>
+
+            <div class="calendar-grid divide-x divide-y divide-gray-100">
+
+                <!-- Semana 1 -->
+                <div class="day-cell p-2.5 bg-gray-50/70"></div>
+                <div class="day-cell p-2.5 bg-gray-50/70"></div>
+                <div class="day-cell p-2.5 bg-gray-50/70"></div>
+
+                <!-- Qua 1 -->
+                <div class="day-cell p-2.5 hover:bg-gray-50 transition cursor-pointer" onclick="selectDay(this, '1 de Abril')">
+                    <span class="text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full">1</span>
+                </div>
+                <!-- Qui 2 -->
+                <div class="day-cell p-2.5 hover:bg-gray-50 transition cursor-pointer" onclick="selectDay(this, '2 de Abril')">
+                    <span class="text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full">2</span>
+                    <div class="mt-1.5 space-y-1">
+                        <div class="text-xs bg-blue-50 text-blue-800 px-1.5 py-1 rounded border-l-2 border-blue-500 font-medium truncate leading-tight">
+                            <span class="font-bold">14:00</span> Aluno X
+                        </div>
+                    </div>
+                </div>
+                <!-- Sex 3 -->
+                <div class="day-cell p-2.5 hover:bg-gray-50 transition cursor-pointer" onclick="selectDay(this, '3 de Abril')">
+                    <span class="text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full">3</span>
+                </div>
+                <!-- Sáb 4 -->
+                <div class="day-cell p-2.5 bg-gray-50/40"></div>
+
+                <!-- Semana 2 -->
+                <!-- Dom 5 -->
+                <div class="day-cell p-2.5 bg-gray-50/40"></div>
+                <!-- Seg 6 -->
+                <div class="day-cell p-2.5 hover:bg-gray-50 transition cursor-pointer" onclick="selectDay(this, '6 de Abril')">
+                    <span class="text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full">6</span>
+                    <div class="mt-1.5 space-y-1">
+                        <div class="text-xs bg-blue-50 text-blue-800 px-1.5 py-1 rounded border-l-2 border-blue-500 font-medium truncate leading-tight">
+                            <span class="font-bold">12:30</span> @vickyr_c
+                        </div>
+                        <div class="text-xs bg-emerald-50 text-emerald-700 px-1.5 py-1 rounded border-l-2 border-emerald-500 font-medium leading-tight">
+                            <span class="font-bold">1</span> vago
+                        </div>
+                    </div>
+                </div>
+                <!-- Ter 7 -->
+                <div class="day-cell p-2.5 hover:bg-gray-50 transition cursor-pointer" onclick="selectDay(this, '7 de Abril')">
+                    <span class="text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full">7</span>
+                </div>
+                <!-- Qua 8 -->
+                <div class="day-cell p-2.5 hover:bg-gray-50 transition cursor-pointer" onclick="selectDay(this, '8 de Abril')">
+                    <span class="text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full">8</span>
+                </div>
+                <!-- Qui 9 -->
+                <div class="day-cell p-2.5 hover:bg-gray-50 transition cursor-pointer" onclick="selectDay(this, '9 de Abril')">
+                    <span class="text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full">9</span>
+                </div>
+                <!-- Sex 10 -->
+                <div class="day-cell p-2.5 hover:bg-gray-50 transition cursor-pointer" onclick="selectDay(this, '10 de Abril')">
+                    <span class="text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full">10</span>
+                    <div class="mt-1.5 space-y-1">
+                        <div class="text-xs bg-blue-50 text-blue-800 px-1.5 py-1 rounded border-l-2 border-blue-500 font-medium truncate leading-tight">
+                            <span class="font-bold">12:30</span> @julyviski
+                        </div>
+                    </div>
+                </div>
+                <!-- Sáb 11 -->
+                <div class="day-cell p-2.5 bg-gray-50/40"></div>
+
+                <!-- Semana 3 -->
+                <!-- Dom 12 -->
+                <div class="day-cell p-2.5 bg-gray-50/40"></div>
+                <!-- Seg 13 -->
+                <div class="day-cell p-2.5 hover:bg-gray-50 transition cursor-pointer" onclick="selectDay(this, '13 de Abril')">
+                    <span class="text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full">13</span>
+                    <div class="mt-1.5 space-y-1">
+                        <div class="text-xs bg-blue-50 text-blue-800 px-1.5 py-1 rounded border-l-2 border-blue-500 font-medium truncate leading-tight">
+                            <span class="font-bold">12:30</span> Confirmado
+                        </div>
+                    </div>
+                </div>
+                <!-- Ter 14 - Feriado -->
+                <div class="day-cell p-2.5 bg-red-50/40 cursor-default">
+                    <div class="flex items-center gap-1">
+                        <span class="text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full text-red-500">14</span>
+                        <span class="text-[9px] font-bold text-red-400 uppercase tracking-wide">Feriado</span>
+                    </div>
+                </div>
+                <!-- Qua 15 -->
+                <div class="day-cell p-2.5 hover:bg-gray-50 transition cursor-pointer" onclick="selectDay(this, '15 de Abril')">
+                    <span class="text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full">15</span>
+                    <div class="mt-1.5 space-y-1">
+                        <div class="text-xs bg-emerald-50 text-emerald-700 px-1.5 py-1 rounded border-l-2 border-emerald-500 font-medium leading-tight">
+                            <span class="font-bold">2</span> vagos
+                        </div>
+                    </div>
+                </div>
+                <!-- Qui 16 -->
+                <div class="day-cell p-2.5 hover:bg-gray-50 transition cursor-pointer" onclick="selectDay(this, '16 de Abril')">
+                    <span class="text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full">16</span>
+                </div>
+                <!-- Sex 17 -->
+                <div class="day-cell p-2.5 hover:bg-gray-50 transition cursor-pointer" onclick="selectDay(this, '17 de Abril')">
+                    <span class="text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full">17</span>
+                    <div class="mt-1.5 space-y-1">
+                        <div class="text-xs bg-blue-50 text-blue-800 px-1.5 py-1 rounded border-l-2 border-blue-500 font-medium truncate leading-tight">
+                            <span class="font-bold">14:00</span> @malu.carv
+                        </div>
+                    </div>
+                </div>
+                <!-- Sáb 18 -->
+                <div class="day-cell p-2.5 bg-gray-50/40"></div>
+
+                <!-- Semana 4 -->
+                <!-- Dom 19 -->
+                <div class="day-cell p-2.5 bg-gray-50/40"></div>
+                <!-- Seg 20 -->
+                <div class="day-cell p-2.5 hover:bg-gray-50 transition cursor-pointer" onclick="selectDay(this, '20 de Abril')">
+                    <span class="text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full">20</span>
+                    <div class="mt-1.5 space-y-1">
+                        <div class="text-xs bg-blue-50 text-blue-800 px-1.5 py-1 rounded border-l-2 border-blue-500 font-medium truncate leading-tight">
+                            <span class="font-bold">12:30</span> @pedro.a
+                        </div>
+                    </div>
+                </div>
+                <!-- Ter 21 -->
+                <div class="day-cell p-2.5 hover:bg-gray-50 transition cursor-pointer" onclick="selectDay(this, '21 de Abril')">
+                    <span class="text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full">21</span>
+                </div>
+                <!-- Qua 22 - HOJE -->
+                <div class="day-cell p-2.5 cursor-pointer bg-blue-50/30 hover:bg-blue-50/50 transition" onclick="selectDay(this, '22 de Abril (Hoje)')">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-bold w-7 h-7 flex items-center justify-center rounded-full bg-blue-600 text-white">22</span>
+                        <span class="text-[9px] font-bold text-blue-500 uppercase tracking-wide">Hoje</span>
+                    </div>
+                    <div class="mt-1.5 space-y-1">
+                        <div class="text-xs bg-blue-600 text-white px-1.5 py-1 rounded font-medium truncate leading-tight shadow-sm">
+                            <span class="font-bold">12:30</span> @vickyr_c
+                        </div>
+                    </div>
+                </div>
+                <!-- Qui 23 -->
+                <div class="day-cell p-2.5 hover:bg-gray-50 transition cursor-pointer" onclick="selectDay(this, '23 de Abril')">
+                    <span class="text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full">23</span>
+                    <div class="mt-1.5 space-y-1">
+                        <div class="text-xs bg-emerald-50 text-emerald-700 px-1.5 py-1 rounded border-l-2 border-emerald-500 font-medium leading-tight">
+                            <span class="font-bold">1</span> vago
+                        </div>
+                    </div>
+                </div>
+                <!-- Sex 24 -->
+                <div class="day-cell p-2.5 hover:bg-gray-50 transition cursor-pointer" onclick="selectDay(this, '24 de Abril')">
+                    <span class="text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full">24</span>
+                    <div class="mt-1.5 space-y-1">
+                        <div class="text-xs bg-blue-50 text-blue-800 px-1.5 py-1 rounded border-l-2 border-blue-500 font-medium truncate leading-tight">
+                            <span class="font-bold">14:00</span> @julyviski
+                        </div>
+                    </div>
+                </div>
+                <!-- Sáb 25 -->
+                <div class="day-cell p-2.5 bg-gray-50/40"></div>
+
+                <!-- Semana 5 -->
+                <!-- Dom 26 -->
+                <div class="day-cell p-2.5 bg-gray-50/40"></div>
+                <!-- Seg 27 -->
+                <div class="day-cell p-2.5 hover:bg-gray-50 transition cursor-pointer" onclick="selectDay(this, '27 de Abril')">
+                    <span class="text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full">27</span>
+                    <div class="mt-1.5 space-y-1">
+                        <div class="text-xs bg-blue-50 text-blue-800 px-1.5 py-1 rounded border-l-2 border-blue-500 font-medium truncate leading-tight">
+                            <span class="font-bold">13:00</span> @ana.b
+                        </div>
+                        <div class="text-xs bg-emerald-50 text-emerald-700 px-1.5 py-1 rounded border-l-2 border-emerald-500 font-medium leading-tight">
+                            <span class="font-bold">1</span> vago
+                        </div>
+                    </div>
+                </div>
+                <!-- Ter 28 -->
+                <div class="day-cell p-2.5 hover:bg-gray-50 transition cursor-pointer" onclick="selectDay(this, '28 de Abril')">
+                    <span class="text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full">28</span>
+                </div>
+                <!-- Qua 29 -->
+                <div class="day-cell p-2.5 hover:bg-gray-50 transition cursor-pointer" onclick="selectDay(this, '29 de Abril')">
+                    <span class="text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full">29</span>
+                </div>
+                <!-- Qui 30 -->
+                <div class="day-cell p-2.5 hover:bg-gray-50 transition cursor-pointer" onclick="selectDay(this, '30 de Abril')">
+                    <span class="text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full">30</span>
+                    <div class="mt-1.5 space-y-1">
+                        <div class="text-xs bg-blue-50 text-blue-800 px-1.5 py-1 rounded border-l-2 border-blue-500 font-medium truncate leading-tight">
+                            <span class="font-bold">12:30</span> @lucas.f
+                        </div>
+                    </div>
+                </div>
+                <!-- Sex e Sáb - próximo mês -->
+                <div class="day-cell p-2.5 bg-gray-50/70"></div>
+                <div class="day-cell p-2.5 bg-gray-50/70"></div>
+            </div>
+        </div>
+
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 md:col-span-2">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 id="dayDetailTitle" class="font-bold text-lg text-gray-800">Detalhes do dia 22 de Abril (Hoje)</h3>
+                    <button onclick="openAddSlotModal()" class="w-8 h-8 flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition shadow-sm shadow-blue-200">
+                        <i class="fas fa-plus text-sm"></i>
+                    </button>
+                </div>
+                <div id="dayDetailList" class="space-y-3">
+                    <div class="flex items-center p-3 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                        <div class="w-16 font-bold text-blue-700">12:30</div>
+                        <div class="flex-1">
+                            <p class="font-bold text-sm">@vickyr_c</p>
+                            <p class="text-xs text-gray-500">Dúvidas Vestibulares (FUVEST)</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="bg-white p-2 rounded border text-gray-400 hover:text-blue-600 transition"><i class="fab fa-telegram-plane"></i></button>
+                            <button class="bg-white p-2 rounded border text-gray-400 hover:text-red-500 transition delete-btn"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-blue-600 to-blue-800 p-6 rounded-xl shadow-lg text-white">
+                <h3 class="font-bold text-lg mb-4 flex items-center">
+                    <i class="fas fa-chart-line mr-2"></i> Resumo do Mês
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center border-b border-blue-400/30 pb-2">
+                        <span class="text-sm opacity-80">Total de Horas</span>
+                        <span class="font-bold">18h</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-blue-400/30 pb-2">
+                        <span class="text-sm opacity-80">Slots Preenchidos</span>
+                        <span class="font-bold text-emerald-300">12</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm opacity-80">Pendentes</span>
+                        <span class="font-bold">04</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Adicionar Horário Pontual -->
+    <div id="addSlotModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transform transition-all scale-95 opacity-0 duration-300" id="addSlotModalContent">
+            <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900">Adicionar Horário Pontual</h3>
+                    <p id="addSlotModalSubtitle" class="text-sm text-gray-500 mt-0.5">22 de Abril (Hoje)</p>
+                </div>
+                <button onclick="closeAddSlotModal()" class="text-gray-400 hover:text-gray-600 transition p-1">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-5">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Data</label>
+                    <input id="addSlotDate" type="date" class="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Horário</label>
+                    <input type="time" id="addSlotTime" min="09:00" max="22:30" step="1800" class="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Modalidade</label>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="setModalidade(this, 'Online')"
+                            class="modalidade-btn flex-1 py-2 px-3 border border-blue-600 bg-blue-50 text-blue-700 rounded-lg text-sm font-semibold transition">
+                            Online
+                        </button>
+                        <button type="button" onclick="setModalidade(this, 'Presencial')"
+                            class="modalidade-btn flex-1 py-2 px-3 border border-gray-200 text-gray-600 rounded-lg text-sm font-semibold hover:bg-gray-50 transition">
+                            Presencial
+                        </button>
+                        <button type="button" onclick="setModalidade(this, 'Misto')"
+                            class="modalidade-btn flex-1 py-2 px-3 border border-gray-200 text-gray-600 rounded-lg text-sm font-semibold hover:bg-gray-50 transition">
+                            Misto
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="px-6 pb-6 flex gap-3">
+                <button onclick="closeAddSlotModal()" class="flex-1 px-4 py-3 border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition text-sm">
+                    Cancelar
+                </button>
+                <button onclick="confirmAddSlot()" class="flex-1 px-4 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-200 text-sm">
+                    Adicionar Slot
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transform transition-all scale-95 opacity-0 duration-300" id="modalContent">
+            <div class="p-8 text-center">
+                <div class="w-20 h-20 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+                    <i class="fas fa-trash-alt text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-2">Confirmar Exclusão?</h3>
+                <p class="text-gray-500 mb-8 leading-relaxed">Tem certeza que deseja excluir este atendimento da agenda?</p>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button id="cancelDelete" class="flex-1 px-6 py-3.5 border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition active:scale-95">
+                        Cancelar
+                    </button>
+                    <button id="confirmDelete" class="flex-1 px-6 py-3.5 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition shadow-lg shadow-red-200 active:scale-95">
+                        Excluir Agora
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-8 right-8 bg-gray-900 text-white px-6 py-3.5 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-500 z-50 flex items-center space-x-3 border border-white/10">
+        <div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-check text-xs"></i>
+        </div>
+        <span class="font-medium">Atendimento removido com sucesso.</span>
+    </div>
+
+    <script>
+        let currentItemToDelete = null;
+
+        const modal = document.getElementById('deleteModal');
+        const modalContent = document.getElementById('modalContent');
+        const toast = document.getElementById('toast');
+
+        function showToast() {
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+
+        function openModal(item) {
+            currentItemToDelete = item;
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeModal() {
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openModal(btn.closest('.flex.items-center.p-3'));
+            });
+        });
+
+        document.getElementById('cancelDelete').addEventListener('click', closeModal);
+
+        document.getElementById('confirmDelete').addEventListener('click', () => {
+            if (currentItemToDelete) {
+                const item = currentItemToDelete;
+                item.style.opacity = '0';
+                item.style.transform = 'scale(0.95)';
+                item.style.transition = 'all 0.3s ease';
+                setTimeout(() => {
+                    const parent = item.parentElement;
+                    item.remove();
+                    if (parent && parent.classList.contains('space-y-3') && parent.children.length === 0) {
+                        parent.innerHTML = '<div class="text-center py-8 text-gray-400 bg-gray-50/50 rounded-xl border border-dashed"><i class="fas fa-calendar-day mb-2 text-2xl block opacity-30"></i><p class="text-sm">Nenhuma atividade para este dia</p></div>';
+                    }
+                    closeModal();
+                    showToast();
+                }, 300);
+            }
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        // --- Modal: Adicionar Horário Pontual ---
+        let selectedModalidade = 'Online';
+
+        const addSlotModal = document.getElementById('addSlotModal');
+        const addSlotModalContent = document.getElementById('addSlotModalContent');
+
+        function openAddSlotModal() {
+            const title = document.getElementById('dayDetailTitle').textContent.replace('Detalhes do dia ', '');
+            document.getElementById('addSlotModalSubtitle').textContent = title;
+
+            // Pré-preenche a data com base no dia selecionado (extrai o número do título)
+            const match = title.match(/(\d+) de (\w+)/);
+            if (match) {
+                const months = { 'Janeiro':1,'Fevereiro':2,'Março':3,'Abril':4,'Maio':5,'Junho':6,'Julho':7,'Agosto':8,'Setembro':9,'Outubro':10,'Novembro':11,'Dezembro':12 };
+                const d = match[1].padStart(2, '0');
+                const m = String(months[match[2]] || 1).padStart(2, '0');
+                document.getElementById('addSlotDate').value = `2026-${m}-${d}`;
+            }
+
+            selectedModalidade = 'Online';
+            document.querySelectorAll('.modalidade-btn').forEach(b => {
+                b.classList.remove('border-blue-600', 'bg-blue-50', 'text-blue-700');
+                b.classList.add('border-gray-200', 'text-gray-600');
+            });
+            document.querySelector('.modalidade-btn').classList.add('border-blue-600', 'bg-blue-50', 'text-blue-700');
+            document.querySelector('.modalidade-btn').classList.remove('border-gray-200', 'text-gray-600');
+
+            addSlotModal.classList.remove('hidden');
+            setTimeout(() => {
+                addSlotModalContent.classList.remove('scale-95', 'opacity-0');
+                addSlotModalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeAddSlotModal() {
+            addSlotModalContent.classList.remove('scale-100', 'opacity-100');
+            addSlotModalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => addSlotModal.classList.add('hidden'), 300);
+        }
+
+        function setModalidade(btn, value) {
+            selectedModalidade = value;
+            document.querySelectorAll('.modalidade-btn').forEach(b => {
+                b.classList.remove('border-blue-600', 'bg-blue-50', 'text-blue-700');
+                b.classList.add('border-gray-200', 'text-gray-600');
+            });
+            btn.classList.remove('border-gray-200', 'text-gray-600');
+            btn.classList.add('border-blue-600', 'bg-blue-50', 'text-blue-700');
+        }
+
+        function confirmAddSlot() {
+            const time = document.getElementById('addSlotTime').value;
+            if (!time) {
+                document.getElementById('addSlotTime').classList.add('border-red-400', 'ring-2', 'ring-red-200');
+                return;
+            }
+            document.getElementById('addSlotTime').classList.remove('border-red-400', 'ring-2', 'ring-red-200');
+
+            const modalidadeColors = {
+                'Online':     'bg-emerald-50 text-emerald-700 border-l-emerald-500',
+                'Presencial': 'bg-blue-50 text-blue-800 border-l-blue-500',
+                'Misto':      'bg-purple-50 text-purple-800 border-l-purple-500',
+            };
+            const colors = modalidadeColors[selectedModalidade];
+            const newItem = document.createElement('div');
+            newItem.className = `flex items-center p-3 rounded-lg border-l-4 ${colors.includes('emerald') ? 'bg-emerald-50 border-emerald-500' : colors.includes('purple') ? 'bg-purple-50 border-purple-500' : 'bg-blue-50 border-blue-500'}`;
+            newItem.innerHTML = `
+                <div class="w-16 font-bold ${colors.includes('emerald') ? 'text-emerald-700' : colors.includes('purple') ? 'text-purple-700' : 'text-blue-700'}">${time}</div>
+                <div class="flex-1">
+                    <p class="font-bold text-sm text-gray-700">Slot vago</p>
+                    <p class="text-xs text-gray-500">${selectedModalidade} · Pontual</p>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="bg-white p-2 rounded border text-gray-400 hover:text-red-500 transition delete-btn"><i class="fas fa-times"></i></button>
+                </div>
+            `;
+            newItem.querySelector('.delete-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                openModal(newItem);
+            });
+
+            const list = document.getElementById('dayDetailList');
+            const empty = list.querySelector('.border-dashed');
+            if (empty) empty.remove();
+            list.appendChild(newItem);
+            newItem.style.opacity = '0';
+            newItem.style.transform = 'translateY(6px)';
+            setTimeout(() => {
+                newItem.style.transition = 'all 0.3s ease';
+                newItem.style.opacity = '1';
+                newItem.style.transform = 'translateY(0)';
+            }, 10);
+
+            closeAddSlotModal();
+            toast.querySelector('span').textContent = 'Horário pontual adicionado.';
+            showToast();
+        }
+
+        addSlotModal.addEventListener('click', (e) => {
+            if (e.target === addSlotModal) closeAddSlotModal();
+        });
+
+        // --- Seleção de dia ---
+        function selectDay(cell, label) {
+            document.querySelectorAll('.day-cell').forEach(c => {
+                c.classList.remove('ring-2', 'ring-blue-500', 'relative', 'z-10');
+            });
+            cell.classList.add('ring-2', 'ring-blue-500', 'relative', 'z-10');
+            document.getElementById('dayDetailTitle').textContent = `Detalhes do dia ${label}`;
+        }
+    </script>
+</body>
+</html>

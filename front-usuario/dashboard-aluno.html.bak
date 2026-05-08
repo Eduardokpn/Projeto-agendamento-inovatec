@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Área do Aluno</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .mini-cal { display: grid; grid-template-columns: repeat(7, 1fr); }
+        .cal-cell { height: 2rem; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <!-- FAKE LOGIN SELECTOR (testing only — remove when real auth is added) -->
+    <div style="position:fixed;top:10px;right:10px;z-index:9999;background:#1e293b;padding:8px 12px;border-radius:8px;">
+        <label style="color:white;font-size:12px;margin-right:8px;">Logado como:</label>
+        <select id="fakeUserSelect" style="font-size:12px;padding:4px;" onchange="onStudentChange()">
+            <option value="1">João Silva</option>
+            <option value="2">Maria Souza</option>
+            <option value="3">Carlos Lima</option>
+        </select>
+    </div>
+
+    <nav class="bg-blue-900 text-white p-4 shadow-md">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="text-xl font-bold tracking-tight">
+                <i class="fas fa-graduation-cap mr-2"></i> InovaTec | Área do Aluno
+            </div>
+            <div class="flex items-center space-x-6">
+                <div class="hidden md:flex space-x-4 text-sm font-medium">
+                    <a href="dashboard-aluno.html" class="text-blue-200 border-b-2 border-blue-200">Dashboard</a>
+                    <a href="agendamento-usuario.html" class="hover:text-blue-200 transition">Agendar</a>
+                </div>
+                <!-- Student name filled dynamically by JS -->
+                <div class="bg-blue-800 px-3 py-1.5 rounded-lg flex items-center space-x-2 cursor-pointer">
+                    <i class="fas fa-user-circle"></i>
+                    <span class="text-sm aluno-nome">...</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto mt-8 px-4 mb-12">
+
+        <!-- Greeting + CTA -->
+        <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <!-- Student name filled dynamically by JS -->
+                <h1 class="text-3xl font-bold text-gray-900">Olá, <span class="aluno-nome">...</span>!</h1>
+                <p class="text-gray-500 mt-1">Aqui estão seus atendimentos.</p>
+            </div>
+            <a href="agendamento-usuario.html"
+               class="inline-flex items-center px-5 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-200 text-sm self-start md:self-auto">
+                <i class="fas fa-plus mr-2"></i> Fazer Agendamento
+            </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-4">
+                <div class="bg-blue-100 text-blue-600 p-3 rounded-xl">
+                    <i class="fas fa-calendar-check text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Próximos agendamentos</p>
+                    <!-- Filled dynamically -->
+                    <p class="text-2xl font-bold text-gray-900" id="statProximos">...</p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-4">
+                <div class="bg-emerald-100 text-emerald-600 p-3 rounded-xl">
+                    <i class="fas fa-check-circle text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Realizados</p>
+                    <!-- Filled dynamically -->
+                    <p class="text-2xl font-bold text-gray-900" id="statRealizados">...</p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-4">
+                <div class="bg-purple-100 text-purple-600 p-3 rounded-xl">
+                    <i class="fas fa-clock text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Total de agendamentos</p>
+                    <!-- Filled dynamically -->
+                    <p class="text-2xl font-bold text-gray-900" id="statTotal">...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Left (2/3): appointments -->
+            <div class="lg:col-span-2 flex flex-col gap-6">
+
+                <!-- Upcoming -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+                        <h2 class="font-bold text-lg text-gray-800">Próximos Agendamentos</h2>
+                        <a href="agendamento-usuario.html" class="text-blue-600 text-sm font-semibold hover:underline">
+                            Agendar mais <i class="fas fa-arrow-right ml-1"></i>
+                        </a>
+                    </div>
+                    <!-- Filled dynamically by renderAgendamentos() -->
+                    <div class="divide-y divide-gray-50" id="upcomingList">
+                        <div class="p-6 text-center text-gray-400 text-sm">Carregando...</div>
+                    </div>
+                </div>
+
+                <!-- Past appointments -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-6 border-b border-gray-100">
+                        <h2 class="font-bold text-lg text-gray-800">Realizados</h2>
+                    </div>
+                    <!-- Filled dynamically by renderAgendamentos() -->
+                    <div class="divide-y divide-gray-50" id="pastList">
+                        <div class="p-6 text-center text-gray-400 text-sm">Carregando...</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right (1/3) -->
+            <div class="flex flex-col gap-5">
+
+                <!-- Telegram status -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                    <h3 class="font-bold text-sm text-gray-700 mb-2 flex items-center">
+                        <i class="fab fa-telegram-plane text-blue-500 mr-2 text-base"></i> Lembretes via Telegram
+                    </h3>
+                    <p class="text-xs text-gray-500 leading-relaxed">
+                        Você receberá um aviso no dia anterior a cada atendimento confirmado.
+                    </p>
+                    <!-- Telegram handle filled dynamically -->
+                    <div class="mt-3 flex items-center space-x-2 text-xs text-emerald-600 bg-emerald-50 p-2.5 rounded-lg">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="telegramHandle">Carregando...</span>
+                    </div>
+                </div>
+
+                <!-- CTA -->
+                <div class="bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl shadow-lg text-white p-6">
+                    <i class="fas fa-calendar-plus text-2xl text-blue-200 mb-3 block"></i>
+                    <h3 class="font-bold text-base leading-snug">Precisa de mais um horário?</h3>
+                    <p class="text-sm text-blue-200 mt-1 mb-4">Agende agora para o mês atual.</p>
+                    <a href="agendamento-usuario.html"
+                       class="block text-center bg-white text-blue-700 font-bold py-2.5 rounded-lg text-sm hover:bg-blue-50 transition">
+                        Ver Horários Disponíveis <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel Modal -->
+    <div id="cancelModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transform transition-all scale-95 opacity-0 duration-300" id="cancelModalContent">
+            <div class="p-8 text-center">
+                <div class="w-16 h-16 bg-yellow-50 text-yellow-500 rounded-full flex items-center justify-center mx-auto mb-5 shadow-inner">
+                    <i class="fas fa-exclamation-triangle text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Cancelar Agendamento?</h3>
+                <p class="text-gray-500 mb-5 text-sm leading-relaxed">
+                    O horário ficará disponível para outros alunos após o cancelamento.
+                </p>
+                <div class="flex gap-3">
+                    <button id="cancelModalClose"
+                        class="flex-1 px-4 py-3 border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition text-sm">
+                        Voltar
+                    </button>
+                    <button id="cancelModalConfirm"
+                        class="flex-1 px-4 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition text-sm">
+                        Cancelar Atendimento
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-8 right-8 bg-gray-900 text-white px-6 py-3.5 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-500 z-50 flex items-center space-x-3 border border-white/10">
+        <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-times text-xs"></i>
+        </div>
+        <span class="font-medium" id="toastMsg">Agendamento cancelado com sucesso.</span>
+    </div>
+
+    <script>
+        // ─────────────────────────────────────────────
+        // FAKE AUTH
+        // Stores the current student ID for testing.
+        // Replace with real token reading when auth is implemented.
+        // ─────────────────────────────────────────────
+        const API = 'http://localhost:3000'
+        let ALUNO_ID = 1
+
+        function onStudentChange() {
+            ALUNO_ID = Number(document.getElementById('fakeUserSelect').value)
+            carregarDashboard()
+        }
+
+        // ─────────────────────────────────────────────
+        // carregarAluno
+        // Fetches student data and fills name + telegram fields
+        // ─────────────────────────────────────────────
+        function carregarAluno() {
+            fetch(`${API}/api/alunos/${ALUNO_ID}`)
+                .then(res => res.json())
+                .then(aluno => {
+                    // Fill every element with class "aluno-nome" with the student's name
+                    document.querySelectorAll('.aluno-nome').forEach(el => {
+                        el.textContent = aluno.nome
+                    })
+                    // Fill telegram handle
+                    document.getElementById('telegramHandle').textContent =
+                        `Bot conectado · ${aluno.telegram}`
+                })
+                .catch(err => console.error('Erro ao carregar aluno:', err))
+        }
+
+        // ─────────────────────────────────────────────
+        // carregarAgendamentos
+        // Fetches all bookings for the current student
+        // and renders them in the upcoming and past lists
+        // ─────────────────────────────────────────────
+        function carregarAgendamentos() {
+            fetch(`${API}/api/alunos/${ALUNO_ID}/agendamentos`)
+                .then(res => res.json())
+                .then(agendamentos => {
+                    // Split into upcoming (confirmado) and past (realizado/cancelado)
+                    const upcoming = agendamentos.filter(a => a.status === 'confirmado')
+                    const past     = agendamentos.filter(a => a.status === 'realizado' || a.status === 'cancelado')
+
+                    // Update stat cards
+                    document.getElementById('statProximos').textContent  = upcoming.length
+                    document.getElementById('statRealizados').textContent = past.filter(a => a.status === 'realizado').length
+                    document.getElementById('statTotal').textContent      = agendamentos.length
+
+                    renderUpcoming(upcoming)
+                    renderPast(past)
+                })
+                .catch(err => console.error('Erro ao carregar agendamentos:', err))
+        }
+
+        // ─────────────────────────────────────────────
+        // renderUpcoming
+        // Builds the HTML for each upcoming agendamento
+        // ─────────────────────────────────────────────
+        function renderUpcoming(list) {
+            const container = document.getElementById('upcomingList')
+
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div class="p-6 text-center text-gray-400 text-sm">
+                        Nenhum agendamento próximo.
+                    </div>`
+                return
+            }
+
+            container.innerHTML = list.map(a => {
+                // Parse the date to get day name and day number
+                const date    = new Date(a.data + 'T12:00:00')
+                const dayName = date.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '')
+                const dayNum  = date.getDate()
+
+                // Badge color per modalidade
+                const badgeColor = {
+                    'Online':     'bg-green-100 text-green-700',
+                    'Presencial': 'bg-orange-100 text-orange-700',
+                    'Misto':      'bg-purple-100 text-purple-700'
+                }[a.modalidade] || 'bg-gray-100 text-gray-700'
+
+                return `
+                <div class="p-5 flex items-center space-x-4 hover:bg-gray-50 transition group" data-id="${a.id}">
+                    <div class="flex-shrink-0 w-12 text-center">
+                        <p class="text-xs text-gray-400 uppercase font-bold">${dayName}</p>
+                        <p class="text-2xl font-bold text-blue-600">${dayNum}</p>
+                    </div>
+                    <div class="w-px h-10 bg-gray-200"></div>
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-2 mb-0.5">
+                            <span class="font-bold text-gray-800">${a.horario}</span>
+                            <span class="text-xs ${badgeColor} px-2 py-0.5 rounded font-medium">${a.modalidade}</span>
+                        </div>
+                        <p class="text-sm text-gray-500">${a.docenteNome} · ${a.tipoAtendimento} (${a.especificacao})</p>
+                    </div>
+                    <button onclick="openCancelModal(this)" class="opacity-0 group-hover:opacity-100 transition text-gray-300 hover:text-red-500 p-2 rounded-lg hover:bg-red-50" title="Cancelar agendamento">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>`
+            }).join('')
+        }
+
+        // ─────────────────────────────────────────────
+        // renderPast
+        // Builds the HTML for past agendamentos
+        // ─────────────────────────────────────────────
+        function renderPast(list) {
+            const container = document.getElementById('pastList')
+
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div class="p-6 text-center text-gray-400 text-sm">
+                        Nenhum atendimento realizado ainda.
+                    </div>`
+                return
+            }
+
+            container.innerHTML = list.map(a => {
+                const date    = new Date(a.data + 'T12:00:00')
+                const dayName = date.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '')
+                const dayNum  = date.getDate()
+
+                const statusBadge = a.status === 'realizado'
+                    ? `<span class="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded font-medium"><i class="fas fa-check text-[10px] mr-1"></i>Realizado</span>`
+                    : `<span class="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded font-medium"><i class="fas fa-times text-[10px] mr-1"></i>Cancelado</span>`
+
+                return `
+                <div class="p-5 flex items-center space-x-4">
+                    <div class="flex-shrink-0 w-12 text-center opacity-50">
+                        <p class="text-xs text-gray-400 uppercase font-bold">${dayName}</p>
+                        <p class="text-2xl font-bold text-gray-400">${dayNum}</p>
+                    </div>
+                    <div class="w-px h-10 bg-gray-200"></div>
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-2 mb-0.5">
+                            <span class="font-medium text-gray-500">${a.horario}</span>
+                            <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded font-medium">${a.modalidade}</span>
+                            ${statusBadge}
+                        </div>
+                        <p class="text-sm text-gray-400">${a.docenteNome} · ${a.tipoAtendimento} (${a.especificacao})</p>
+                    </div>
+                </div>`
+            }).join('')
+        }
+
+        // ─────────────────────────────────────────────
+        // carregarDashboard
+        // Runs all fetch calls together when page loads
+        // or when the student selector changes
+        // ─────────────────────────────────────────────
+        function carregarDashboard() {
+            carregarAluno()
+            carregarAgendamentos()
+        }
+
+        // ─────────────────────────────────────────────
+        // CANCEL MODAL
+        // ─────────────────────────────────────────────
+        const cancelModal        = document.getElementById('cancelModal')
+        const cancelModalContent = document.getElementById('cancelModalContent')
+        const toast              = document.getElementById('toast')
+        let itemToCancel         = null
+        let agendamentoIdToCancel = null
+
+        function openCancelModal(btn) {
+            itemToCancel          = btn.closest('.group')
+            agendamentoIdToCancel = Number(itemToCancel.dataset.id)
+            cancelModal.classList.remove('hidden')
+            setTimeout(() => {
+                cancelModalContent.classList.remove('scale-95', 'opacity-0')
+                cancelModalContent.classList.add('scale-100', 'opacity-100')
+            }, 10)
+        }
+
+        function closeCancelModal() {
+            cancelModalContent.classList.remove('scale-100', 'opacity-100')
+            cancelModalContent.classList.add('scale-95', 'opacity-0')
+            setTimeout(() => cancelModal.classList.add('hidden'), 300)
+        }
+
+        document.getElementById('cancelModalClose').addEventListener('click', closeCancelModal)
+        cancelModal.addEventListener('click', e => { if (e.target === cancelModal) closeCancelModal() })
+
+        // ─────────────────────────────────────────────
+        // confirmCancel
+        // Sends PATCH request to cancel the agendamento
+        // then removes the item from the screen
+        // ─────────────────────────────────────────────
+        document.getElementById('cancelModalConfirm').addEventListener('click', () => {
+            if (!agendamentoIdToCancel) return
+
+            fetch(`${API}/api/agendamentos/${agendamentoIdToCancel}/cancelar`, {
+                method: 'PATCH'
+            })
+            .then(res => res.json())
+            .then(() => {
+                // Animate item out of the list
+                itemToCancel.style.transition = 'all 0.3s ease'
+                itemToCancel.style.opacity    = '0'
+                itemToCancel.style.transform  = 'translateX(12px)'
+                setTimeout(() => {
+                    itemToCancel.remove()
+                    closeCancelModal()
+                    showToast('Agendamento cancelado com sucesso.')
+                    // Reload stats
+                    carregarAgendamentos()
+                }, 300)
+            })
+            .catch(err => {
+                console.error('Erro ao cancelar:', err)
+                showToast('Erro ao cancelar agendamento.')
+            })
+        })
+
+        function showToast(msg) {
+            document.getElementById('toastMsg').textContent = msg
+            toast.classList.remove('translate-y-20', 'opacity-0')
+            toast.classList.add('translate-y-0', 'opacity-100')
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0')
+                toast.classList.remove('translate-y-0', 'opacity-100')
+            }, 3500)
+        }
+
+        // ─────────────────────────────────────────────
+        // START
+        // Load everything when the page first opens
+        // ─────────────────────────────────────────────
+        carregarDashboard()
+    </script>
+</body>
+</html>

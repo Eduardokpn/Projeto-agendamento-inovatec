@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastros - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <nav class="bg-blue-900 text-white p-4 shadow-md">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="text-xl font-bold tracking-tight">
+                <i class="fas fa-shield-alt mr-2"></i> InovaTec | Admin
+            </div>
+            <div class="flex items-center space-x-6">
+                <div class="hidden md:flex space-x-4 text-sm font-medium">
+                    <a href="dashboard-admin.html" class="hover:text-blue-200 transition">Dashboard</a>
+                    <a href="cadastro-admin.html" class="text-blue-200 border-b-2 border-blue-200">Cadastros</a>
+                </div>
+                <div class="bg-blue-800 px-3 py-1.5 rounded-lg flex items-center space-x-2 cursor-pointer">
+                    <i class="fas fa-user-shield"></i>
+                    <span class="text-sm">Admin</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto mt-8 px-4 mb-12">
+
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Cadastros</h1>
+            <p class="text-gray-500 mt-1">Gerencie alunos e docentes do sistema.</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex space-x-1 bg-gray-100 p-1 rounded-xl w-fit mb-8">
+            <button id="tabAlunos" onclick="switchTab('alunos')"
+                class="px-6 py-2.5 rounded-lg text-sm font-bold transition bg-white text-blue-700 shadow-sm">
+                <i class="fas fa-user-graduate mr-2"></i> Alunos
+            </button>
+            <button id="tabDocentes" onclick="switchTab('docentes')"
+                class="px-6 py-2.5 rounded-lg text-sm font-bold transition text-gray-500 hover:text-gray-700">
+                <i class="fas fa-chalkboard-teacher mr-2"></i> Docentes
+            </button>
+        </div>
+
+        <!-- ALUNOS panel -->
+        <div id="panelAlunos" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Form -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sticky top-6">
+                    <h2 class="font-bold text-base text-gray-800 mb-5 flex items-center">
+                        <i class="fas fa-plus-circle text-blue-500 mr-2"></i> Cadastrar Aluno
+                    </h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Nome completo</label>
+                            <input type="text" id="alunoNome" placeholder="Ex: João Silva"
+                                class="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">E-mail</label>
+                            <input type="email" id="alunoEmail" placeholder="aluno@email.com"
+                                class="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Telegram</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">@</span>
+                                <input type="text" id="alunoTelegram" placeholder="handle"
+                                    class="w-full border border-gray-200 rounded-lg pl-7 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Turno</label>
+                            <select id="alunoTurno" class="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="">Selecione...</option>
+                                <option>Vespertino</option>
+                                <option>Noturno</option>
+                            </select>
+                        </div>
+                        <p id="alunoFormError" class="text-xs text-red-500 hidden">Preencha todos os campos obrigatórios.</p>
+                        <button onclick="addAluno()"
+                            class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-200 text-sm">
+                            Cadastrar Aluno
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- List -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <h2 class="font-bold text-base text-gray-800">Alunos Cadastrados</h2>
+                            <span id="alunoCount" class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-semibold">...</span>
+                        </div>
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                            <input type="text" placeholder="Buscar..." oninput="filterList('alunoList', this.value)"
+                                class="border border-gray-200 rounded-lg pl-7 pr-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none w-44">
+                        </div>
+                    </div>
+                    <div id="alunoList" class="divide-y divide-gray-50">
+                        <div class="p-8 text-center text-gray-400 text-sm">
+                            <i class="fas fa-spinner fa-spin text-2xl mb-2 block opacity-30"></i>
+                            Carregando...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOCENTES panel (hidden by default) -->
+        <div id="panelDocentes" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Form -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sticky top-6">
+                    <h2 class="font-bold text-base text-gray-800 mb-5 flex items-center">
+                        <i class="fas fa-plus-circle text-blue-500 mr-2"></i> Cadastrar Docente
+                    </h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Nome completo</label>
+                            <input type="text" id="docenteNome" placeholder="Ex: Rafael Souza"
+                                class="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">E-mail</label>
+                            <input type="email" id="docenteEmail" placeholder="docente@email.com"
+                                class="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Telegram</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">@</span>
+                                <input type="text" id="docenteTelegram" placeholder="handle"
+                                    class="w-full border border-gray-200 rounded-lg pl-7 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Papel</label>
+                            <select id="docentePapel" class="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="">Selecione...</option>
+                                <option>Mentor</option>
+                                <option>Docente</option>
+                                <option>Coordenador</option>
+                            </select>
+                        </div>
+                        <p id="docenteFormError" class="text-xs text-red-500 hidden">Preencha todos os campos obrigatórios.</p>
+                        <button onclick="addDocente()"
+                            class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-200 text-sm">
+                            Cadastrar Docente
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- List -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <h2 class="font-bold text-base text-gray-800">Docentes Cadastrados</h2>
+                            <span id="docenteCount" class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-semibold">...</span>
+                        </div>
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                            <input type="text" placeholder="Buscar..." oninput="filterList('docenteList', this.value)"
+                                class="border border-gray-200 rounded-lg pl-7 pr-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none w-44">
+                        </div>
+                    </div>
+                    <div id="docenteList" class="divide-y divide-gray-50">
+                        <div class="p-8 text-center text-gray-400 text-sm">
+                            <i class="fas fa-spinner fa-spin text-2xl mb-2 block opacity-30"></i>
+                            Carregando...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Edit Aluno Modal -->
+    <div id="editAlunoModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transform transition-all scale-95 opacity-0 duration-300" id="editAlunoModalContent">
+            <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+                <h3 class="font-bold text-base text-gray-900 flex items-center">
+                    <i class="fas fa-pen text-blue-500 mr-2"></i> Editar Aluno
+                </h3>
+                <button onclick="fecharEditarAluno()" class="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Nome completo</label>
+                    <input type="text" id="editAlunoNome"
+                        class="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">E-mail</label>
+                    <input type="email" id="editAlunoEmail"
+                        class="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Telegram</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">@</span>
+                        <input type="text" id="editAlunoTelegram"
+                            class="w-full border border-gray-200 rounded-lg pl-7 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Turno</label>
+                    <select id="editAlunoTurno" class="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <option>Vespertino</option>
+                        <option>Noturno</option>
+                    </select>
+                </div>
+                <p id="editAlunoError" class="text-xs text-red-500 hidden"></p>
+                <div class="flex gap-3 pt-1">
+                    <button onclick="fecharEditarAluno()" class="flex-1 px-4 py-3 border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition text-sm">
+                        Cancelar
+                    </button>
+                    <button onclick="salvarEdicaoAluno()" class="flex-1 px-4 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition text-sm">
+                        Salvar Alterações
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Docente Modal -->
+    <div id="editDocenteModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transform transition-all scale-95 opacity-0 duration-300" id="editDocenteModalContent">
+            <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+                <h3 class="font-bold text-base text-gray-900 flex items-center">
+                    <i class="fas fa-pen text-blue-500 mr-2"></i> Editar Docente
+                </h3>
+                <button onclick="fecharEditarDocente()" class="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Nome completo</label>
+                    <input type="text" id="editDocenteNome"
+                        class="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">E-mail</label>
+                    <input type="email" id="editDocenteEmail"
+                        class="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Telegram</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">@</span>
+                        <input type="text" id="editDocenteTelegram"
+                            class="w-full border border-gray-200 rounded-lg pl-7 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Papel</label>
+                    <select id="editDocentePapel" class="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <option>Mentor</option>
+                        <option>Docente</option>
+                        <option>Coordenador</option>
+                    </select>
+                </div>
+                <p id="editDocenteError" class="text-xs text-red-500 hidden"></p>
+                <div class="flex gap-3 pt-1">
+                    <button onclick="fecharEditarDocente()" class="flex-1 px-4 py-3 border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition text-sm">
+                        Cancelar
+                    </button>
+                    <button onclick="salvarEdicaoDocente()" class="flex-1 px-4 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition text-sm">
+                        Salvar Alterações
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deactivate confirmation modal -->
+    <div id="deactivateModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden transform transition-all scale-95 opacity-0 duration-300" id="deactivateModalContent">
+            <div class="p-7 text-center">
+                <div class="w-14 h-14 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+                    <i class="fas fa-ban text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Desativar usuário?</h3>
+                <p class="text-gray-500 text-sm mb-6 leading-relaxed">
+                    O usuário perderá acesso ao sistema. Você poderá reativá-lo depois.
+                </p>
+                <div class="flex gap-3">
+                    <button id="deactivateCancelBtn" class="flex-1 px-4 py-3 border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition text-sm">
+                        Cancelar
+                    </button>
+                    <button id="deactivateConfirmBtn" class="flex-1 px-4 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition text-sm">
+                        Desativar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-8 right-8 bg-gray-900 text-white px-6 py-3.5 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-500 z-50 flex items-center space-x-3 border border-white/10">
+        <div id="toastIcon" class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-check text-xs"></i>
+        </div>
+        <span id="toastMsg" class="font-medium">Cadastrado com sucesso!</span>
+    </div>
+
+    <script>
+        const API = 'http://localhost:3000'
+
+        // In-memory cache for client-side search filtering
+        let todosAlunos   = []
+        let todosDocentes = []
+
+        const AVATAR_COLORS = [
+            'bg-blue-100 text-blue-600',
+            'bg-purple-100 text-purple-600',
+            'bg-emerald-100 text-emerald-600',
+            'bg-orange-100 text-orange-600',
+            'bg-pink-100 text-pink-600',
+            'bg-teal-100 text-teal-600',
+        ]
+
+        function getAvatarColor(id) {
+            return AVATAR_COLORS[(id - 1) % AVATAR_COLORS.length]
+        }
+
+        function getInitials(name) {
+            return name.trim().split(' ').filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('')
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // TAB SWITCHING
+        // ─────────────────────────────────────────────────────────────────────
+
+        function switchTab(tab) {
+            const isAlunos = tab === 'alunos'
+            document.getElementById('panelAlunos').classList.toggle('hidden', !isAlunos)
+            document.getElementById('panelDocentes').classList.toggle('hidden', isAlunos)
+
+            const tabA = document.getElementById('tabAlunos')
+            const tabD = document.getElementById('tabDocentes')
+
+            if (isAlunos) {
+                tabA.classList.add('bg-white', 'text-blue-700', 'shadow-sm')
+                tabA.classList.remove('text-gray-500')
+                tabD.classList.remove('bg-white', 'text-blue-700', 'shadow-sm')
+                tabD.classList.add('text-gray-500')
+            } else {
+                tabD.classList.add('bg-white', 'text-blue-700', 'shadow-sm')
+                tabD.classList.remove('text-gray-500')
+                tabA.classList.remove('bg-white', 'text-blue-700', 'shadow-sm')
+                tabA.classList.add('text-gray-500')
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // ALUNOS — LOAD & RENDER
+        // ─────────────────────────────────────────────────────────────────────
+
+        function carregarAlunos() {
+            fetch(`${API}/api/admin/alunos`)
+                .then(res => res.json())
+                .then(alunos => {
+                    todosAlunos = alunos
+                    renderAlunos(alunos)
+                })
+                .catch(() => {
+                    document.getElementById('alunoList').innerHTML =
+                        '<p class="p-5 text-center text-red-400 text-sm">Erro ao conectar com o servidor.</p>'
+                })
+        }
+
+        function renderAlunos(alunos) {
+            const list = document.getElementById('alunoList')
+            document.getElementById('alunoCount').textContent = alunos.length
+
+            if (alunos.length === 0) {
+                list.innerHTML = `
+                    <div class="p-10 text-center text-gray-400 text-sm">
+                        <i class="fas fa-user-slash text-3xl mb-3 block opacity-20"></i>
+                        Nenhum aluno encontrado.
+                    </div>`
+                return
+            }
+
+            list.innerHTML = alunos.map(a => {
+                const color    = getAvatarColor(a.id)
+                const initials = getInitials(a.nome)
+                const statusBadge = a.ativo
+                    ? `<span class="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium">Ativo</span>`
+                    : `<span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">Inativo</span>`
+                const deactivateBtn = a.ativo
+                    ? `<button onclick="confirmDeactivate(${a.id}, 'aluno')" class="p-1.5 text-gray-400 hover:text-red-500 transition rounded-lg hover:bg-red-50" title="Desativar">
+                           <i class="fas fa-ban text-xs"></i>
+                       </button>`
+                    : ''
+                return `
+                    <div class="list-item p-4 flex items-center space-x-4 hover:bg-gray-50 transition" data-name="${a.nome}">
+                        <div class="w-9 h-9 ${color} rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">${initials}</div>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-semibold text-gray-800 text-sm truncate">${a.nome}</p>
+                            <p class="text-xs text-gray-400 truncate">${a.telegram} · ${a.turno}</p>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            ${statusBadge}
+                            <button onclick="abrirEditarAluno(${a.id})"
+                                class="p-1.5 text-gray-400 hover:text-blue-500 transition rounded-lg hover:bg-blue-50" title="Editar">
+                                <i class="fas fa-pen text-xs"></i>
+                            </button>
+                            ${deactivateBtn}
+                        </div>
+                    </div>`
+            }).join('')
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // ALUNOS — CADASTRAR
+        // ─────────────────────────────────────────────────────────────────────
+
+        function addAluno() {
+            const nome  = document.getElementById('alunoNome').value.trim()
+            const email = document.getElementById('alunoEmail').value.trim()
+            const tg    = document.getElementById('alunoTelegram').value.trim()
+            const turno = document.getElementById('alunoTurno').value
+            const errEl = document.getElementById('alunoFormError')
+
+            if (!nome || !email || !tg || !turno) {
+                errEl.textContent = 'Preencha todos os campos obrigatórios.'
+                errEl.classList.remove('hidden')
+                return
+            }
+            errEl.classList.add('hidden')
+
+            fetch(`${API}/api/admin/alunos`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome, email, telegram: tg, turno })
+            })
+                .then(res => res.json().then(data => ({ status: res.status, data })))
+                .then(({ status, data }) => {
+                    if (status !== 201) {
+                        errEl.textContent = data.erro || 'Erro ao cadastrar.'
+                        errEl.classList.remove('hidden')
+                        return
+                    }
+                    ;['alunoNome', 'alunoEmail', 'alunoTelegram'].forEach(id => document.getElementById(id).value = '')
+                    document.getElementById('alunoTurno').value = ''
+                    carregarAlunos()
+                    showToast(`${data.nome} cadastrado com sucesso!`, 'success')
+                })
+                .catch(() => {
+                    errEl.textContent = 'Erro de conexão com o servidor.'
+                    errEl.classList.remove('hidden')
+                })
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // ALUNOS — EDITAR
+        // ─────────────────────────────────────────────────────────────────────
+
+        let editandoAlunoId = null
+
+        function abrirEditarAluno(id) {
+            const aluno = todosAlunos.find(a => a.id === id)
+            if (!aluno) return
+            editandoAlunoId = id
+
+            document.getElementById('editAlunoNome').value     = aluno.nome
+            document.getElementById('editAlunoEmail').value    = aluno.email
+            document.getElementById('editAlunoTelegram').value = aluno.telegram.replace('@', '')
+            document.getElementById('editAlunoTurno').value    = aluno.turno
+            document.getElementById('editAlunoError').classList.add('hidden')
+
+            abrirModal('editAlunoModal', 'editAlunoModalContent')
+        }
+
+        function fecharEditarAluno() {
+            fecharModal('editAlunoModal', 'editAlunoModalContent')
+        }
+
+        function salvarEdicaoAluno() {
+            const nome  = document.getElementById('editAlunoNome').value.trim()
+            const email = document.getElementById('editAlunoEmail').value.trim()
+            const tg    = document.getElementById('editAlunoTelegram').value.trim()
+            const turno = document.getElementById('editAlunoTurno').value
+            const errEl = document.getElementById('editAlunoError')
+
+            if (!nome || !email || !tg || !turno) {
+                errEl.textContent = 'Preencha todos os campos.'
+                errEl.classList.remove('hidden')
+                return
+            }
+            errEl.classList.add('hidden')
+
+            fetch(`${API}/api/admin/alunos/${editandoAlunoId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome, email, telegram: tg, turno })
+            })
+                .then(res => res.json().then(data => ({ status: res.status, data })))
+                .then(({ status, data }) => {
+                    if (status !== 200) {
+                        errEl.textContent = data.erro || 'Erro ao salvar.'
+                        errEl.classList.remove('hidden')
+                        return
+                    }
+                    fecharEditarAluno()
+                    carregarAlunos()
+                    showToast('Dados atualizados com sucesso!', 'success')
+                })
+                .catch(() => {
+                    errEl.textContent = 'Erro de conexão com o servidor.'
+                    errEl.classList.remove('hidden')
+                })
+        }
+
+        document.getElementById('editAlunoModal').addEventListener('click', e => {
+            if (e.target === document.getElementById('editAlunoModal')) fecharEditarAluno()
+        })
+
+        // ─────────────────────────────────────────────────────────────────────
+        // DOCENTES — LOAD & RENDER
+        // ─────────────────────────────────────────────────────────────────────
+
+        function carregarDocentes() {
+            fetch(`${API}/api/admin/docentes`)
+                .then(res => res.json())
+                .then(docentes => {
+                    todosDocentes = docentes
+                    renderDocentes(docentes)
+                })
+                .catch(() => {
+                    document.getElementById('docenteList').innerHTML =
+                        '<p class="p-5 text-center text-red-400 text-sm">Erro ao conectar com o servidor.</p>'
+                })
+        }
+
+        function renderDocentes(docentes) {
+            const list = document.getElementById('docenteList')
+            document.getElementById('docenteCount').textContent = docentes.length
+
+            if (docentes.length === 0) {
+                list.innerHTML = `
+                    <div class="p-10 text-center text-gray-400 text-sm">
+                        <i class="fas fa-chalkboard-teacher text-3xl mb-3 block opacity-20"></i>
+                        Nenhum docente encontrado.
+                    </div>`
+                return
+            }
+
+            const papelColor = {
+                Mentor: 'bg-blue-50 text-blue-600',
+                Docente: 'bg-purple-50 text-purple-600',
+                Coordenador: 'bg-orange-50 text-orange-600'
+            }
+
+            list.innerHTML = docentes.map(d => {
+                const color    = getAvatarColor(d.id)
+                const initials = getInitials(d.nome)
+                const badgeColor  = papelColor[d.papel] || 'bg-gray-100 text-gray-600'
+                const statusBadge = d.ativo
+                    ? `<span class="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium">Ativo</span>`
+                    : `<span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">Inativo</span>`
+                const deactivateBtn = d.ativo
+                    ? `<button onclick="confirmDeactivate(${d.id}, 'docente')" class="p-1.5 text-gray-400 hover:text-red-500 transition rounded-lg hover:bg-red-50" title="Desativar">
+                           <i class="fas fa-ban text-xs"></i>
+                       </button>`
+                    : ''
+                return `
+                    <div class="list-item p-4 flex items-center space-x-4 hover:bg-gray-50 transition" data-name="${d.nome}">
+                        <div class="w-9 h-9 ${color} rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">${initials}</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center space-x-2">
+                                <p class="font-semibold text-gray-800 text-sm">${d.nome}</p>
+                                <span class="text-xs ${badgeColor} px-1.5 py-0.5 rounded font-medium">${d.papel}</span>
+                            </div>
+                            <p class="text-xs text-gray-400 truncate">${d.telegram} · ${d.email}</p>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            ${statusBadge}
+                            <a href="../front-docente/dashboard-docente.html"
+                               class="p-1.5 text-gray-400 hover:text-blue-500 transition rounded-lg hover:bg-blue-50 text-xs" title="Ver agenda">
+                                <i class="fas fa-calendar-alt"></i>
+                            </a>
+                            <button onclick="abrirEditarDocente(${d.id})"
+                                class="p-1.5 text-gray-400 hover:text-blue-500 transition rounded-lg hover:bg-blue-50" title="Editar">
+                                <i class="fas fa-pen text-xs"></i>
+                            </button>
+                            ${deactivateBtn}
+                        </div>
+                    </div>`
+            }).join('')
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // DOCENTES — CADASTRAR
+        // ─────────────────────────────────────────────────────────────────────
+
+        function addDocente() {
+            const nome  = document.getElementById('docenteNome').value.trim()
+            const email = document.getElementById('docenteEmail').value.trim()
+            const tg    = document.getElementById('docenteTelegram').value.trim()
+            const papel = document.getElementById('docentePapel').value
+            const errEl = document.getElementById('docenteFormError')
+
+            if (!nome || !email || !tg || !papel) {
+                errEl.textContent = 'Preencha todos os campos obrigatórios.'
+                errEl.classList.remove('hidden')
+                return
+            }
+            errEl.classList.add('hidden')
+
+            fetch(`${API}/api/admin/docentes`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome, email, telegram: tg, papel })
+            })
+                .then(res => res.json().then(data => ({ status: res.status, data })))
+                .then(({ status, data }) => {
+                    if (status !== 201) {
+                        errEl.textContent = data.erro || 'Erro ao cadastrar.'
+                        errEl.classList.remove('hidden')
+                        return
+                    }
+                    ;['docenteNome', 'docenteEmail', 'docenteTelegram'].forEach(id => document.getElementById(id).value = '')
+                    document.getElementById('docentePapel').value = ''
+                    carregarDocentes()
+                    showToast(`${data.nome} cadastrado com sucesso!`, 'success')
+                })
+                .catch(() => {
+                    errEl.textContent = 'Erro de conexão com o servidor.'
+                    errEl.classList.remove('hidden')
+                })
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // DOCENTES — EDITAR
+        // ─────────────────────────────────────────────────────────────────────
+
+        let editandoDocenteId = null
+
+        function abrirEditarDocente(id) {
+            const docente = todosDocentes.find(d => d.id === id)
+            if (!docente) return
+            editandoDocenteId = id
+
+            document.getElementById('editDocenteNome').value     = docente.nome
+            document.getElementById('editDocenteEmail').value    = docente.email
+            document.getElementById('editDocenteTelegram').value = docente.telegram.replace('@', '')
+            document.getElementById('editDocentePapel').value    = docente.papel
+            document.getElementById('editDocenteError').classList.add('hidden')
+
+            abrirModal('editDocenteModal', 'editDocenteModalContent')
+        }
+
+        function fecharEditarDocente() {
+            fecharModal('editDocenteModal', 'editDocenteModalContent')
+        }
+
+        function salvarEdicaoDocente() {
+            const nome  = document.getElementById('editDocenteNome').value.trim()
+            const email = document.getElementById('editDocenteEmail').value.trim()
+            const tg    = document.getElementById('editDocenteTelegram').value.trim()
+            const papel = document.getElementById('editDocentePapel').value
+            const errEl = document.getElementById('editDocenteError')
+
+            if (!nome || !email || !tg || !papel) {
+                errEl.textContent = 'Preencha todos os campos.'
+                errEl.classList.remove('hidden')
+                return
+            }
+            errEl.classList.add('hidden')
+
+            fetch(`${API}/api/admin/docentes/${editandoDocenteId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome, email, telegram: tg, papel })
+            })
+                .then(res => res.json().then(data => ({ status: res.status, data })))
+                .then(({ status, data }) => {
+                    if (status !== 200) {
+                        errEl.textContent = data.erro || 'Erro ao salvar.'
+                        errEl.classList.remove('hidden')
+                        return
+                    }
+                    fecharEditarDocente()
+                    carregarDocentes()
+                    showToast('Dados atualizados com sucesso!', 'success')
+                })
+                .catch(() => {
+                    errEl.textContent = 'Erro de conexão com o servidor.'
+                    errEl.classList.remove('hidden')
+                })
+        }
+
+        document.getElementById('editDocenteModal').addEventListener('click', e => {
+            if (e.target === document.getElementById('editDocenteModal')) fecharEditarDocente()
+        })
+
+        // ─────────────────────────────────────────────────────────────────────
+        // DESATIVAR
+        // ─────────────────────────────────────────────────────────────────────
+
+        let deactivateTarget = null // { id, tipo: 'aluno' | 'docente' }
+
+        function confirmDeactivate(id, tipo) {
+            deactivateTarget = { id, tipo }
+            abrirModal('deactivateModal', 'deactivateModalContent')
+        }
+
+        function closeDeactivateModal() {
+            fecharModal('deactivateModal', 'deactivateModalContent')
+        }
+
+        document.getElementById('deactivateCancelBtn').addEventListener('click', closeDeactivateModal)
+        document.getElementById('deactivateModal').addEventListener('click', e => {
+            if (e.target === document.getElementById('deactivateModal')) closeDeactivateModal()
+        })
+
+        document.getElementById('deactivateConfirmBtn').addEventListener('click', () => {
+            if (!deactivateTarget) return
+            const { id, tipo } = deactivateTarget
+            const url = tipo === 'aluno'
+                ? `${API}/api/admin/alunos/${id}`
+                : `${API}/api/admin/docentes/${id}`
+
+            fetch(url, { method: 'DELETE' })
+                .then(res => res.json().then(data => ({ status: res.status, data })))
+                .then(({ status, data }) => {
+                    closeDeactivateModal()
+                    if (status !== 200) {
+                        showToast(data.erro || 'Erro ao desativar.', 'error')
+                        return
+                    }
+                    if (tipo === 'aluno') carregarAlunos()
+                    else carregarDocentes()
+                    showToast('Usuário desativado com sucesso.', 'warning')
+                })
+                .catch(() => showToast('Erro de conexão.', 'error'))
+        })
+
+        // ─────────────────────────────────────────────────────────────────────
+        // BUSCA LOCAL
+        // ─────────────────────────────────────────────────────────────────────
+
+        function filterList(listId, query) {
+            const q = query.toLowerCase()
+            document.querySelectorAll(`#${listId} .list-item`).forEach(item => {
+                const name = (item.dataset.name || '').toLowerCase()
+                item.classList.toggle('hidden', !!q && !name.includes(q))
+            })
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // HELPERS DE MODAL
+        // ─────────────────────────────────────────────────────────────────────
+
+        function abrirModal(modalId, contentId) {
+            document.getElementById(modalId).classList.remove('hidden')
+            setTimeout(() => {
+                document.getElementById(contentId).classList.remove('scale-95', 'opacity-0')
+                document.getElementById(contentId).classList.add('scale-100', 'opacity-100')
+            }, 10)
+        }
+
+        function fecharModal(modalId, contentId) {
+            document.getElementById(contentId).classList.remove('scale-100', 'opacity-100')
+            document.getElementById(contentId).classList.add('scale-95', 'opacity-0')
+            setTimeout(() => document.getElementById(modalId).classList.add('hidden'), 300)
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // TOAST
+        // ─────────────────────────────────────────────────────────────────────
+
+        function showToast(msg, type) {
+            const toast = document.getElementById('toast')
+            const icon  = document.getElementById('toastIcon')
+            document.getElementById('toastMsg').textContent = msg
+            const colorMap = { success: 'bg-emerald-500', warning: 'bg-yellow-500', error: 'bg-red-500' }
+            const iconMap  = { success: 'fa-check', warning: 'fa-exclamation', error: 'fa-times' }
+            icon.className = `w-8 h-8 ${colorMap[type] || 'bg-emerald-500'} rounded-full flex items-center justify-center flex-shrink-0`
+            icon.innerHTML = `<i class="fas ${iconMap[type] || 'fa-check'} text-xs text-white"></i>`
+            toast.classList.remove('translate-y-20', 'opacity-0')
+            toast.classList.add('translate-y-0', 'opacity-100')
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0')
+                toast.classList.remove('translate-y-0', 'opacity-100')
+            }, 3500)
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // INIT
+        // ─────────────────────────────────────────────────────────────────────
+
+        carregarAlunos()
+        carregarDocentes()
+    </script>
+</body>
+</html>

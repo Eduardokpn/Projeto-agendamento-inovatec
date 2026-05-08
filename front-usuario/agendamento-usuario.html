@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamento - Área do Aluno</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <!-- FAKE LOGIN SELECTOR (testing only — remove when real auth is added) -->
+    <div style="position:fixed;top:10px;right:10px;z-index:9999;background:#1e293b;padding:8px 12px;border-radius:8px;">
+        <label style="color:white;font-size:12px;margin-right:8px;">Logado como:</label>
+        <select id="fakeUserSelect" style="font-size:12px;padding:4px;" onchange="onStudentChange()">
+            <option value="1">João Silva</option>
+            <option value="2">Maria Souza</option>
+            <option value="3">Carlos Lima</option>
+        </select>
+    </div>
+
+    <nav class="bg-blue-900 text-white p-4 shadow-md">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="text-xl font-bold tracking-tight">
+                <i class="fas fa-graduation-cap mr-2"></i> InovaTec | Área do Aluno
+            </div>
+            <div class="flex items-center space-x-6">
+                <div class="hidden md:flex space-x-4 text-sm font-medium">
+                    <a href="dashboard-aluno.html" class="hover:text-blue-200 transition">Dashboard</a>
+                    <a href="agendamento-usuario.html" class="text-blue-200 border-b-2 border-blue-200">Agendar</a>
+                </div>
+                <!-- Student name filled dynamically -->
+                <div class="bg-blue-800 px-3 py-1.5 rounded-lg flex items-center space-x-2 cursor-pointer">
+                    <i class="fas fa-user-circle"></i>
+                    <span class="text-sm aluno-nome">...</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto mt-8 flex flex-col md:flex-row gap-6 px-4 mb-12">
+
+        <!-- Sidebar -->
+        <aside class="w-full md:w-1/4 flex flex-col gap-4">
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h2 class="font-bold text-lg mb-4 border-b pb-2">Filtros</h2>
+
+                <div class="mb-5">
+                    <h3 class="text-sm font-semibold text-gray-600 mb-2">Modalidade</h3>
+                    <div class="flex flex-col space-y-2.5">
+                        <label class="flex items-center space-x-2.5 text-sm cursor-pointer">
+                            <input type="checkbox" id="filter-online" class="rounded text-blue-600 focus:ring-blue-500" checked onchange="applyFilters()">
+                            <span class="flex items-center space-x-2">
+                                <span class="w-2 h-2 rounded-full bg-green-500 inline-block flex-shrink-0"></span>
+                                <span>Online</span>
+                            </span>
+                        </label>
+                        <label class="flex items-center space-x-2.5 text-sm cursor-pointer">
+                            <input type="checkbox" id="filter-presencial" class="rounded text-blue-600 focus:ring-blue-500" checked onchange="applyFilters()">
+                            <span class="flex items-center space-x-2">
+                                <span class="w-2 h-2 rounded-full bg-blue-500 inline-block flex-shrink-0"></span>
+                                <span>Presencial</span>
+                            </span>
+                        </label>
+                        <label class="flex items-center space-x-2.5 text-sm cursor-pointer">
+                            <input type="checkbox" id="filter-misto" class="rounded text-blue-600 focus:ring-blue-500" checked onchange="applyFilters()">
+                            <span class="flex items-center space-x-2">
+                                <span class="w-2 h-2 rounded-full bg-purple-500 inline-block flex-shrink-0"></span>
+                                <span>Misto</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Month restriction note -->
+            <div class="bg-blue-50 border border-blue-100 rounded-xl p-4">
+                <div class="flex items-start space-x-2">
+                    <i class="fas fa-info-circle text-blue-400 mt-0.5 flex-shrink-0"></i>
+                    <p class="text-sm text-blue-700 leading-snug">
+                        Agendamentos disponíveis apenas para o <strong>mês atual</strong>.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Waiting list -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                <p class="text-sm text-gray-600 font-medium mb-3">Não encontrou um horário compatível?</p>
+                <button onclick="openWaitingListModal()"
+                    class="w-full bg-blue-600 text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700 transition shadow-sm">
+                    <i class="fas fa-list-ul mr-2"></i> Entrar na Lista de Espera
+                </button>
+            </div>
+
+        </aside>
+
+        <!-- Main content -->
+        <main class="w-full md:w-3/4 flex flex-col gap-4">
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
+                    <div>
+                        <h2 class="font-bold text-xl text-gray-800">Selecione um Horário</h2>
+                        <p class="text-sm text-gray-500 mt-0.5">Slots disponíveis carregados do sistema.</p>
+                    </div>
+                </div>
+
+                <!-- Slots grid — filled dynamically by renderSlots() -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3" id="slotsGrid">
+                    <div class="col-span-4 p-6 text-center text-gray-400 text-sm">
+                        Carregando slots disponíveis...
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto transform transition-all scale-95 opacity-0 duration-300" id="bookingModalContent">
+
+            <div class="p-6 border-b border-gray-100 sticky top-0 bg-white z-10">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-lg font-bold text-gray-900">Confirmar Agendamento</h3>
+                    <button onclick="closeBookingModal()" class="text-gray-400 hover:text-gray-600 transition p-1 rounded-lg hover:bg-gray-100">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+                <!-- Slot summary — filled dynamically -->
+                <div class="flex items-center space-x-3 bg-blue-50 p-3.5 rounded-xl border border-blue-100">
+                    <div class="bg-blue-100 text-blue-600 p-2.5 rounded-lg flex-shrink-0">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    <div>
+                        <p id="slotSummaryDate" class="font-bold text-sm text-gray-800">—</p>
+                        <p id="slotSummaryInfo" class="text-xs text-gray-500 mt-0.5">—</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 space-y-5">
+
+                <!-- Tipo de Atendimento -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Tipo de Atendimento <span class="text-red-500">*</span>
+                    </label>
+                    <div class="space-y-2" id="tipoOptions">
+                        <label class="flex items-start space-x-3 p-3 border border-gray-200 rounded-xl cursor-pointer hover:border-blue-400 transition">
+                            <input type="radio" name="tipo" value="simulado" class="mt-0.5 text-blue-600 flex-shrink-0" onchange="updateEspecificacao()">
+                            <div>
+                                <p class="text-sm font-semibold text-gray-800">Desempenho no Simulado</p>
+                                <p class="text-xs text-gray-500 mt-0.5">Revisão e análise da sua prova mais recente</p>
+                            </div>
+                        </label>
+                        <label class="flex items-start space-x-3 p-3 border border-gray-200 rounded-xl cursor-pointer hover:border-blue-400 transition">
+                            <input type="radio" name="tipo" value="vestibulares" class="mt-0.5 text-blue-600 flex-shrink-0" onchange="updateEspecificacao()">
+                            <div>
+                                <p class="text-sm font-semibold text-gray-800">Dúvidas sobre Vestibulares</p>
+                                <p class="text-xs text-gray-500 mt-0.5">Técnicas de estudo e dúvidas sobre provas</p>
+                            </div>
+                        </label>
+                        <label class="flex items-start space-x-3 p-3 border border-gray-200 rounded-xl cursor-pointer hover:border-blue-400 transition">
+                            <input type="radio" name="tipo" value="cronograma" class="mt-0.5 text-blue-600 flex-shrink-0" onchange="updateEspecificacao()">
+                            <div>
+                                <p class="text-sm font-semibold text-gray-800">Elaboração de Cronograma</p>
+                                <p class="text-xs text-gray-500 mt-0.5">Planejamento de estudos personalizado</p>
+                            </div>
+                        </label>
+                        <label class="flex items-start space-x-3 p-3 border border-gray-200 rounded-xl cursor-pointer hover:border-blue-400 transition">
+                            <input type="radio" name="tipo" value="outros" class="mt-0.5 text-blue-600 flex-shrink-0" onchange="updateEspecificacao()">
+                            <div>
+                                <p class="text-sm font-semibold text-gray-800">Outros</p>
+                                <p class="text-xs text-gray-500 mt-0.5">Outras questões de orientação</p>
+                            </div>
+                        </label>
+                    </div>
+                    <p id="tipoError" class="text-xs text-red-500 mt-1.5 hidden">Selecione o tipo de atendimento.</p>
+                </div>
+
+                <!-- Especificação (dynamic) -->
+                <div id="especificacaoBlock" class="hidden">
+                    <label id="especificacaoLabel" class="block text-sm font-semibold text-gray-700 mb-1.5">
+                        Especificação <span class="text-red-500">*</span>
+                    </label>
+                    <input id="especificacaoInput" type="text" placeholder=""
+                        class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none hidden">
+                    <select id="especificacaoSelect"
+                        class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none hidden">
+                        <option value="">Selecione o turno...</option>
+                        <option value="Noturno">Noturno</option>
+                        <option value="Vespertino">Vespertino</option>
+                    </select>
+                    <p id="especificacaoError" class="text-xs text-red-500 mt-1.5 hidden">Preencha este campo.</p>
+                </div>
+
+                <!-- Telegram — filled dynamically from student data -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                        Seu Telegram <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">@</span>
+                        <input type="text" id="telegramInput"
+                            class="w-full border border-gray-300 rounded-lg pl-7 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            placeholder="seu.telegram">
+                    </div>
+                    <p class="text-xs text-gray-400 mt-1">Para receber o lembrete no dia anterior.</p>
+                </div>
+
+            </div>
+
+            <div class="px-6 pb-6 flex gap-3">
+                <button onclick="closeBookingModal()"
+                    class="flex-1 px-4 py-3 border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition text-sm">
+                    Cancelar
+                </button>
+                <button onclick="confirmBooking()"
+                    class="flex-1 px-4 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-200 text-sm">
+                    Confirmar Agendamento
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Waiting List Modal -->
+    <div id="waitingListModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transform transition-all scale-95 opacity-0 duration-300" id="waitingListContent">
+            <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900">Lista de Espera</h3>
+                    <p class="text-sm text-gray-500 mt-0.5">Entraremos em contato quando um horário abrir.</p>
+                </div>
+                <button onclick="closeWaitingListModal()" class="text-gray-400 hover:text-gray-600 transition p-1 rounded-lg hover:bg-gray-100">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Turno preferencial</label>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="setTurno(this, 'Vespertino')"
+                            class="turno-btn flex-1 py-2.5 border border-blue-500 bg-blue-50 text-blue-700 rounded-lg text-sm font-semibold transition">
+                            Vespertino
+                        </button>
+                        <button type="button" onclick="setTurno(this, 'Noturno')"
+                            class="turno-btn flex-1 py-2.5 border border-gray-200 text-gray-600 rounded-lg text-sm font-semibold hover:bg-gray-50 transition">
+                            Noturno
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Dias e horários de preferência</label>
+                    <textarea id="diasPreferencia" rows="2" placeholder="Ex: Segundas e quintas, qualquer horário após as 18h..."
+                        class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"></textarea>
+                </div>
+            </div>
+            <div class="px-6 pb-6 flex gap-3">
+                <button onclick="closeWaitingListModal()"
+                    class="flex-1 px-4 py-3 border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition text-sm">
+                    Cancelar
+                </button>
+                <button onclick="confirmWaitingList()"
+                    class="flex-1 px-4 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-200 text-sm">
+                    Entrar na Fila
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-8 right-8 bg-gray-900 text-white px-6 py-3.5 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-500 z-50 flex items-center space-x-3 border border-white/10">
+        <div id="toastIcon" class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-check text-xs"></i>
+        </div>
+        <span id="toastMsg" class="font-medium">Agendamento confirmado!</span>
+    </div>
+
+    <script>
+        // ─────────────────────────────────────────────
+        // FAKE AUTH
+        // Stores the current student ID for testing.
+        // Replace with real token reading when auth is implemented.
+        // ─────────────────────────────────────────────
+        const API = 'http://localhost:3000'
+        let ALUNO_ID = 1
+        let alunoData = null      // stores full student object after fetch
+        let currentSlot = null    // stores the slot being booked
+        let selectedTurno = 'Vespertino' // waiting list turno selection
+
+        function onStudentChange() {
+            ALUNO_ID = Number(document.getElementById('fakeUserSelect').value)
+            carregarPagina()
+        }
+
+        // ─────────────────────────────────────────────
+        // carregarAluno
+        // Fetches student data and fills name + telegram fields
+        // ─────────────────────────────────────────────
+        function carregarAluno() {
+            fetch(`${API}/api/alunos/${ALUNO_ID}`)
+                .then(res => res.json())
+                .then(aluno => {
+                    alunoData = aluno
+                    // Fill navbar name
+                    document.querySelectorAll('.aluno-nome').forEach(el => {
+                        el.textContent = aluno.nome
+                    })
+                    // Pre-fill telegram in booking modal
+                    const handle = aluno.telegram.replace('@', '')
+                    document.getElementById('telegramInput').value = handle
+                })
+                .catch(err => console.error('Erro ao carregar aluno:', err))
+        }
+
+        // ─────────────────────────────────────────────
+        // carregarSlots
+        // Fetches available slots from GET /api/slots
+        // and renders them in the grid
+        // ─────────────────────────────────────────────
+        function carregarSlots() {
+            fetch(`${API}/api/slots?alunoId=${ALUNO_ID}`)
+                .then(res => res.json())
+                .then(slots => {
+                    renderSlots(slots)
+                })
+                .catch(err => {
+                    console.error('Erro ao carregar slots:', err)
+                    document.getElementById('slotsGrid').innerHTML = `
+                        <div class="col-span-4 p-6 text-center text-red-400 text-sm">
+                            Erro ao carregar slots. Verifique se o servidor está rodando.
+                        </div>`
+                })
+        }
+
+        // ─────────────────────────────────────────────
+        // renderSlots
+        // Builds the HTML cards for each available slot
+        // ─────────────────────────────────────────────
+        function renderSlots(slots) {
+            const grid = document.getElementById('slotsGrid')
+
+            if (slots.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-4 p-8 text-center text-gray-400 text-sm">
+                        <i class="fas fa-calendar-times text-3xl mb-3 block text-gray-300"></i>
+                        Nenhum slot disponível no momento.<br>
+                        <span class="text-xs mt-1 block">Tente a lista de espera!</span>
+                    </div>`
+                return
+            }
+
+            // Badge colors per modalidade
+            const badgeColor = {
+                'Online':     'bg-green-100 text-green-700',
+                'Presencial': 'bg-blue-100 text-blue-700',
+                'Misto':      'bg-purple-100 text-purple-700'
+            }
+
+            grid.innerHTML = slots.map(slot => {
+                // Parse date for display
+                const date    = new Date(slot.data + 'T12:00:00')
+                const dayName = date.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '')
+                const dateStr = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+                const fullDate = date.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
+                const badge   = badgeColor[slot.modalidade] || 'bg-gray-100 text-gray-700'
+                const mod     = slot.modalidade.toLowerCase()
+
+                return `
+                <div class="slot-card p-3 border border-gray-200 rounded-lg hover:border-blue-400 hover:shadow-md transition cursor-pointer bg-white group"
+                    data-id="${slot.id}"
+                    data-modalidade="${mod}"
+                    data-time="${slot.horario}"
+                    data-docente="${slot.docenteNome}"
+                    data-date="${fullDate}">
+                    <div class="flex flex-col items-center pb-2 border-b border-gray-100 mb-2">
+                        <span class="text-xs font-semibold text-gray-500 uppercase">${dayName}</span>
+                        <span class="text-xs text-gray-400">${dateStr}</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-gray-800 text-sm">${slot.horario}</span>
+                        <span class="text-xs ${badge} px-2 py-0.5 rounded font-medium">${slot.modalidade}</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mb-2">${slot.docenteNome}</p>
+                    <button onclick="openBookingModal(this.closest('.slot-card'))"
+                        class="w-full py-1.5 text-xs font-semibold text-white bg-blue-600 rounded-md opacity-0 group-hover:opacity-100 transition hover:bg-blue-700">
+                        Agendar
+                    </button>
+                </div>`
+            }).join('')
+
+            // Re-apply filters after rendering
+            applyFilters()
+        }
+
+        // ─────────────────────────────────────────────
+        // Tipo de Atendimento config
+        // ─────────────────────────────────────────────
+        const tipoConfig = {
+            simulado:    { label: 'Qual prova?',                type: 'text',   placeholder: 'Ex: ENEM 2025, FUVEST 1ª fase...' },
+            vestibulares:{ label: 'Universidade ou prova alvo', type: 'text',   placeholder: 'Ex: FUVEST, UNICAMP, ENEM...' },
+            cronograma:  { label: 'Seu turno',                  type: 'select', placeholder: '' },
+            outros:      { label: 'Descreva sua necessidade',   type: 'text',   placeholder: 'Explique brevemente o que precisa...' },
+        }
+
+        function updateEspecificacao() {
+            const selected = document.querySelector('input[name="tipo"]:checked')?.value
+            const block    = document.getElementById('especificacaoBlock')
+            const label    = document.getElementById('especificacaoLabel')
+            const input    = document.getElementById('especificacaoInput')
+            const sel      = document.getElementById('especificacaoSelect')
+
+            document.getElementById('tipoError').classList.add('hidden')
+            if (!selected) { block.classList.add('hidden'); return }
+
+            const cfg = tipoConfig[selected]
+            label.innerHTML = `${cfg.label} <span class="text-red-500">*</span>`
+            block.classList.remove('hidden')
+            document.getElementById('especificacaoError').classList.add('hidden')
+
+            if (cfg.type === 'select') {
+                input.classList.add('hidden')
+                sel.classList.remove('hidden')
+                sel.value = ''
+            } else {
+                sel.classList.add('hidden')
+                input.classList.remove('hidden')
+                input.placeholder = cfg.placeholder
+                input.value = ''
+            }
+        }
+
+        // Highlight selected radio label
+        document.getElementById('tipoOptions').addEventListener('change', () => {
+            document.querySelectorAll('#tipoOptions label').forEach(label => {
+                const radio = label.querySelector('input[type="radio"]')
+                if (radio.checked) {
+                    label.classList.add('border-blue-500', 'bg-blue-50')
+                    label.classList.remove('border-gray-200')
+                } else {
+                    label.classList.remove('border-blue-500', 'bg-blue-50')
+                    label.classList.add('border-gray-200')
+                }
+            })
+        })
+
+        // ─────────────────────────────────────────────
+        // BOOKING MODAL
+        // ─────────────────────────────────────────────
+        const bookingModal        = document.getElementById('bookingModal')
+        const bookingModalContent = document.getElementById('bookingModalContent')
+
+        function openBookingModal(slotEl) {
+            currentSlot = slotEl
+
+            // Fill slot summary
+            document.getElementById('slotSummaryDate').textContent =
+                `${slotEl.dataset.date} · ${slotEl.dataset.time}`
+            document.getElementById('slotSummaryInfo').textContent =
+                `${slotEl.dataset.docente} · ${slotEl.dataset.modalidade}`
+
+            // Reset form
+            document.querySelectorAll('input[name="tipo"]').forEach(r => r.checked = false)
+            document.querySelectorAll('#tipoOptions label').forEach(l => {
+                l.classList.remove('border-blue-500', 'bg-blue-50')
+                l.classList.add('border-gray-200')
+            })
+            document.getElementById('especificacaoBlock').classList.add('hidden')
+            document.getElementById('especificacaoInput').value = ''
+            document.getElementById('especificacaoSelect').value = ''
+            document.getElementById('tipoError').classList.add('hidden')
+            document.getElementById('especificacaoError').classList.add('hidden')
+
+            bookingModal.classList.remove('hidden')
+            setTimeout(() => {
+                bookingModalContent.classList.remove('scale-95', 'opacity-0')
+                bookingModalContent.classList.add('scale-100', 'opacity-100')
+            }, 10)
+        }
+
+        function closeBookingModal() {
+            bookingModalContent.classList.remove('scale-100', 'opacity-100')
+            bookingModalContent.classList.add('scale-95', 'opacity-0')
+            setTimeout(() => bookingModal.classList.add('hidden'), 300)
+        }
+
+        bookingModal.addEventListener('click', e => {
+            if (e.target === bookingModal) closeBookingModal()
+        })
+
+        // ─────────────────────────────────────────────
+        // confirmBooking
+        // Validates the form then sends POST /api/agendamentos
+        // ─────────────────────────────────────────────
+        function confirmBooking() {
+            const tipo = document.querySelector('input[name="tipo"]:checked')?.value
+            if (!tipo) {
+                document.getElementById('tipoError').classList.remove('hidden')
+                return
+            }
+
+            const cfg = tipoConfig[tipo]
+            let especificacao = ''
+
+            if (cfg.type === 'text') {
+                especificacao = document.getElementById('especificacaoInput').value.trim()
+                if (!especificacao) {
+                    document.getElementById('especificacaoError').classList.remove('hidden')
+                    return
+                }
+            } else {
+                especificacao = document.getElementById('especificacaoSelect').value
+                if (!especificacao) {
+                    document.getElementById('especificacaoError').classList.remove('hidden')
+                    return
+                }
+            }
+
+            const slotId = Number(currentSlot.dataset.id)
+
+            // Send POST to backend
+            fetch(`${API}/api/agendamentos`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    alunoId: ALUNO_ID,
+                    slotId,
+                    tipoAtendimento: tipo,
+                    especificacao
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.erro) {
+                    showToast(data.erro, 'error')
+                    closeBookingModal()
+                    return
+                }
+
+                // Mark slot card as booked visually
+                currentSlot.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-gray-700 text-sm">${currentSlot.dataset.time}</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mb-2">${currentSlot.dataset.docente}</p>
+                    <div class="flex items-center space-x-1.5 text-xs text-emerald-600 bg-emerald-50 px-2 py-1.5 rounded-lg border border-emerald-100">
+                        <i class="fas fa-check-circle"></i>
+                        <span class="font-semibold">Confirmado</span>
+                    </div>`
+                currentSlot.classList.remove('hover:border-blue-400', 'hover:shadow-md', 'cursor-pointer', 'group')
+                currentSlot.classList.add('border-emerald-200', 'bg-emerald-50/30')
+
+                closeBookingModal()
+                showToast('Agendamento confirmado! Você receberá um lembrete no Telegram.', 'success')
+            })
+            .catch(err => {
+                console.error('Erro ao agendar:', err)
+                showToast('Erro ao confirmar agendamento.', 'error')
+            })
+        }
+
+        // ─────────────────────────────────────────────
+        // WAITING LIST MODAL
+        // ─────────────────────────────────────────────
+        const waitingListModal   = document.getElementById('waitingListModal')
+        const waitingListContent = document.getElementById('waitingListContent')
+
+        function openWaitingListModal() {
+            waitingListModal.classList.remove('hidden')
+            setTimeout(() => {
+                waitingListContent.classList.remove('scale-95', 'opacity-0')
+                waitingListContent.classList.add('scale-100', 'opacity-100')
+            }, 10)
+        }
+
+        function closeWaitingListModal() {
+            waitingListContent.classList.remove('scale-100', 'opacity-100')
+            waitingListContent.classList.add('scale-95', 'opacity-0')
+            setTimeout(() => waitingListModal.classList.add('hidden'), 300)
+        }
+
+        waitingListModal.addEventListener('click', e => {
+            if (e.target === waitingListModal) closeWaitingListModal()
+        })
+
+        function setTurno(btn, value) {
+            selectedTurno = value
+            document.querySelectorAll('.turno-btn').forEach(b => {
+                b.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700')
+                b.classList.add('border-gray-200', 'text-gray-600')
+            })
+            btn.classList.remove('border-gray-200', 'text-gray-600')
+            btn.classList.add('border-blue-500', 'bg-blue-50', 'text-blue-700')
+        }
+
+        // ─────────────────────────────────────────────
+        // confirmWaitingList
+        // Sends POST /api/lista-espera with student preferences
+        // ─────────────────────────────────────────────
+        function confirmWaitingList() {
+            const diasPreferencia = document.getElementById('diasPreferencia').value.trim()
+
+            fetch(`${API}/api/lista-espera`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    alunoId: ALUNO_ID,
+                    turnoPreferencial: selectedTurno,
+                    diasPreferencia
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.erro) {
+                    showToast(data.erro, 'error')
+                    closeWaitingListModal()
+                    return
+                }
+                closeWaitingListModal()
+                showToast('Você entrou na lista de espera!', 'success')
+            })
+            .catch(err => {
+                console.error('Erro ao entrar na lista de espera:', err)
+                showToast('Erro ao entrar na lista de espera.', 'error')
+            })
+        }
+
+        // ─────────────────────────────────────────────
+        // FILTERS
+        // Hides/shows slot cards based on modalidade checkboxes
+        // ─────────────────────────────────────────────
+        function applyFilters() {
+            const showOnline     = document.getElementById('filter-online').checked
+            const showPresencial = document.getElementById('filter-presencial').checked
+            const showMisto      = document.getElementById('filter-misto').checked
+
+            document.querySelectorAll('.slot-card[data-modalidade]').forEach(card => {
+                const m = card.dataset.modalidade
+                const show = (m === 'online'     && showOnline)     ||
+                             (m === 'presencial'  && showPresencial) ||
+                             (m === 'misto'       && showMisto)
+                card.style.display = show ? '' : 'none'
+            })
+        }
+
+        // ─────────────────────────────────────────────
+        // TOAST
+        // ─────────────────────────────────────────────
+        function showToast(msg, type) {
+            const toast = document.getElementById('toast')
+            const icon  = document.getElementById('toastIcon')
+            document.getElementById('toastMsg').textContent = msg
+            icon.className = `w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${type === 'success' ? 'bg-emerald-500' : 'bg-red-500'}`
+            toast.classList.remove('translate-y-20', 'opacity-0')
+            toast.classList.add('translate-y-0', 'opacity-100')
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0')
+                toast.classList.remove('translate-y-0', 'opacity-100')
+            }, 4000)
+        }
+
+        // ─────────────────────────────────────────────
+        // START
+        // Load everything when the page first opens
+        // ─────────────────────────────────────────────
+        function carregarPagina() {
+            carregarAluno()
+            carregarSlots()
+        }
+
+        carregarPagina()
+    </script>
+</body>
+</html>

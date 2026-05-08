@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <nav class="bg-blue-900 text-white p-4 shadow-md">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="text-xl font-bold tracking-tight">
+                <i class="fas fa-shield-alt mr-2"></i> InovaTec | Admin
+            </div>
+            <div class="flex items-center space-x-6">
+                <div class="hidden md:flex space-x-4 text-sm font-medium">
+                    <a href="dashboard-admin.html" class="text-blue-200 border-b-2 border-blue-200">Dashboard</a>
+                    <a href="cadastro-admin.html" class="hover:text-blue-200 transition">Cadastros</a>
+                </div>
+                <div class="bg-blue-800 px-3 py-1.5 rounded-lg flex items-center space-x-2 cursor-pointer">
+                    <i class="fas fa-user-shield"></i>
+                    <span class="text-sm">Admin</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto mt-8 px-4 mb-12">
+
+        <!-- Header -->
+        <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Visão Geral</h1>
+                <p class="text-gray-500 mt-1">Abril 2026 · Todos os atendimentos</p>
+            </div>
+            <div class="flex gap-2 self-start md:self-auto">
+                <a href="cadastro-admin.html"
+                   class="inline-flex items-center px-4 py-2.5 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition text-sm shadow-sm">
+                    <i class="fas fa-user-plus mr-2 text-blue-500"></i> Cadastrar
+                </a>
+                <button onclick="exportReport()"
+                    class="inline-flex items-center px-4 py-2.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition text-sm shadow-lg shadow-blue-200">
+                    <i class="fas fa-file-download mr-2"></i> Exportar Relatório
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-3">
+                <div class="bg-blue-100 text-blue-600 p-3 rounded-xl flex-shrink-0">
+                    <i class="fas fa-calendar-check text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 leading-tight">Agendamentos em Abril</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-0.5">24</p>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-3">
+                <div class="bg-emerald-100 text-emerald-600 p-3 rounded-xl flex-shrink-0">
+                    <i class="fas fa-users text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 leading-tight">Alunos atendidos</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-0.5">18</p>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-3">
+                <div class="bg-purple-100 text-purple-600 p-3 rounded-xl flex-shrink-0">
+                    <i class="fas fa-check-double text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 leading-tight">Taxa de presença</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-0.5">87%</p>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-3">
+                <div class="bg-red-100 text-red-500 p-3 rounded-xl flex-shrink-0">
+                    <i class="fas fa-user-times text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 leading-tight">Cancelamentos / Faltas</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-0.5">3</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+            <!-- Main: filters + table -->
+            <div class="lg:col-span-3 flex flex-col gap-5">
+
+                <!-- Filters -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Mês</label>
+                            <select class="w-full border border-gray-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option selected>Abril 2026</option>
+                                <option>Março 2026</option>
+                                <option>Fevereiro 2026</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Aluno</label>
+                            <div class="relative">
+                                <i class="fas fa-search absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                                <input type="text" id="filterAluno" placeholder="Buscar aluno..." oninput="applyTableFilters()"
+                                    class="w-full border border-gray-200 rounded-lg pl-7 pr-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Docente</label>
+                            <select id="filterDocente" onchange="applyTableFilters()" class="w-full border border-gray-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="">Todos</option>
+                                <option>Rafa</option>
+                                <option>Letícia</option>
+                                <option>Heloísa</option>
+                                <option>Larissa</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Status</label>
+                            <select id="filterStatus" onchange="applyTableFilters()" class="w-full border border-gray-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="">Todos</option>
+                                <option>Confirmado</option>
+                                <option>Realizado</option>
+                                <option>Cancelado</option>
+                                <option>Faltou</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <h2 class="font-bold text-base text-gray-800">Agendamentos</h2>
+                            <span id="tableCount" class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-semibold">8</span>
+                        </div>
+                        <span class="text-xs text-gray-400">Abril 2026</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="bg-gray-50 border-b border-gray-100 text-left">
+                                    <th class="px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wide whitespace-nowrap">Data / Hora</th>
+                                    <th class="px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wide">Aluno</th>
+                                    <th class="px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wide">Docente</th>
+                                    <th class="px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wide">Tipo</th>
+                                    <th class="px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wide">Modalidade</th>
+                                    <th class="px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wide">Status</th>
+                                    <th class="px-4 py-3"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="appointmentsTable" class="divide-y divide-gray-50">
+
+                                <tr class="hover:bg-gray-50 transition table-row" data-aluno="João" data-docente="Letícia" data-status="Realizado">
+                                    <td class="px-4 py-3.5 whitespace-nowrap">
+                                        <p class="font-semibold text-gray-700">Sex 10/04</p>
+                                        <p class="text-xs text-gray-400">12:30</p>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <p class="font-medium text-gray-800">João Silva</p>
+                                        <p class="text-xs text-gray-400">@joao.silva</p>
+                                    </td>
+                                    <td class="px-4 py-3.5 text-gray-700 font-medium">Letícia</td>
+                                    <td class="px-4 py-3.5 text-gray-600 text-xs leading-snug">
+                                        Dúvidas Vestibulares<br>
+                                        <span class="text-gray-400">UNICAMP</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded font-medium">Online</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <span class="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-semibold">Realizado</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <button onclick="openDetailModal(this)" class="text-gray-400 hover:text-blue-500 transition p-1" title="Ver detalhes">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <tr class="hover:bg-gray-50 transition table-row" data-aluno="João" data-docente="Heloísa" data-status="Realizado">
+                                    <td class="px-4 py-3.5 whitespace-nowrap">
+                                        <p class="font-semibold text-gray-700">Qui 17/04</p>
+                                        <p class="text-xs text-gray-400">14:00</p>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <p class="font-medium text-gray-800">João Silva</p>
+                                        <p class="text-xs text-gray-400">@joao.silva</p>
+                                    </td>
+                                    <td class="px-4 py-3.5 text-gray-700 font-medium">Heloísa</td>
+                                    <td class="px-4 py-3.5 text-gray-600 text-xs leading-snug">
+                                        Cronograma de Estudos<br>
+                                        <span class="text-gray-400">Noturno</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <span class="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded font-medium">Misto</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <span class="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-semibold">Realizado</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <button onclick="openDetailModal(this)" class="text-gray-400 hover:text-blue-500 transition p-1">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <tr class="bg-blue-50/30 hover:bg-blue-50/50 transition table-row" data-aluno="Victoria" data-docente="Rafa" data-status="Confirmado">
+                                    <td class="px-4 py-3.5 whitespace-nowrap">
+                                        <p class="font-semibold text-blue-700">Qua 22/04 · Hoje</p>
+                                        <p class="text-xs text-blue-400">12:30</p>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <p class="font-medium text-gray-800">Victoria R.</p>
+                                        <p class="text-xs text-gray-400">@vickyr_c</p>
+                                    </td>
+                                    <td class="px-4 py-3.5 text-gray-700 font-medium">Rafa</td>
+                                    <td class="px-4 py-3.5 text-gray-600 text-xs leading-snug">
+                                        Dúvidas Vestibulares<br>
+                                        <span class="text-gray-400">FUVEST</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded font-medium">Online</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-semibold">Confirmado</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <button onclick="openDetailModal(this)" class="text-gray-400 hover:text-blue-500 transition p-1">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <tr class="hover:bg-gray-50 transition table-row" data-aluno="João" data-docente="Heloísa" data-status="Confirmado">
+                                    <td class="px-4 py-3.5 whitespace-nowrap">
+                                        <p class="font-semibold text-gray-700">Qui 24/04</p>
+                                        <p class="text-xs text-gray-400">14:00</p>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <p class="font-medium text-gray-800">João Silva</p>
+                                        <p class="text-xs text-gray-400">@joao.silva</p>
+                                    </td>
+                                    <td class="px-4 py-3.5 text-gray-700 font-medium">Heloísa</td>
+                                    <td class="px-4 py-3.5 text-gray-600 text-xs leading-snug">
+                                        Dúvidas Vestibulares<br>
+                                        <span class="text-gray-400">FUVEST</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded font-medium">Online</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-semibold">Confirmado</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <button onclick="openDetailModal(this)" class="text-gray-400 hover:text-blue-500 transition p-1">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <tr class="hover:bg-gray-50 transition table-row" data-aluno="Julia" data-docente="Rafa" data-status="Confirmado">
+                                    <td class="px-4 py-3.5 whitespace-nowrap">
+                                        <p class="font-semibold text-gray-700">Sex 24/04</p>
+                                        <p class="text-xs text-gray-400">12:30</p>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <p class="font-medium text-gray-800">Julia V.</p>
+                                        <p class="text-xs text-gray-400">@julyviski</p>
+                                    </td>
+                                    <td class="px-4 py-3.5 text-gray-700 font-medium">Rafa</td>
+                                    <td class="px-4 py-3.5 text-gray-600 text-xs leading-snug">
+                                        Cronograma de Estudos<br>
+                                        <span class="text-gray-400">Vespertino</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded font-medium">Online</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-semibold">Confirmado</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <button onclick="openDetailModal(this)" class="text-gray-400 hover:text-blue-500 transition p-1">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <tr class="hover:bg-gray-50 transition table-row" data-aluno="João" data-docente="Rafa" data-status="Confirmado">
+                                    <td class="px-4 py-3.5 whitespace-nowrap">
+                                        <p class="font-semibold text-gray-700">Seg 27/04</p>
+                                        <p class="text-xs text-gray-400">12:30</p>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <p class="font-medium text-gray-800">João Silva</p>
+                                        <p class="text-xs text-gray-400">@joao.silva</p>
+                                    </td>
+                                    <td class="px-4 py-3.5 text-gray-700 font-medium">Rafa</td>
+                                    <td class="px-4 py-3.5 text-gray-600 text-xs leading-snug">
+                                        Cronograma de Estudos<br>
+                                        <span class="text-gray-400">Noturno</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded font-medium">Online</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-semibold">Confirmado</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <button onclick="openDetailModal(this)" class="text-gray-400 hover:text-blue-500 transition p-1">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <tr class="hover:bg-gray-50 transition table-row" data-aluno="Ana" data-docente="Rafa" data-status="Confirmado">
+                                    <td class="px-4 py-3.5 whitespace-nowrap">
+                                        <p class="font-semibold text-gray-700">Seg 27/04</p>
+                                        <p class="text-xs text-gray-400">13:00</p>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <p class="font-medium text-gray-800">Ana Beatriz</p>
+                                        <p class="text-xs text-gray-400">@ana.b</p>
+                                    </td>
+                                    <td class="px-4 py-3.5 text-gray-700 font-medium">Rafa</td>
+                                    <td class="px-4 py-3.5 text-gray-600 text-xs leading-snug">
+                                        Outros<br>
+                                        <span class="text-gray-400">Orientação de carreira</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-medium">Presencial</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-semibold">Confirmado</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <button onclick="openDetailModal(this)" class="text-gray-400 hover:text-blue-500 transition p-1">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <tr class="hover:bg-gray-50 transition table-row" data-aluno="Malu" data-docente="Letícia" data-status="Confirmado">
+                                    <td class="px-4 py-3.5 whitespace-nowrap">
+                                        <p class="font-semibold text-gray-700">Qua 29/04</p>
+                                        <p class="text-xs text-gray-400">14:00</p>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <p class="font-medium text-gray-800">Malu C.</p>
+                                        <p class="text-xs text-gray-400">@malu.carv</p>
+                                    </td>
+                                    <td class="px-4 py-3.5 text-gray-700 font-medium">Letícia</td>
+                                    <td class="px-4 py-3.5 text-gray-600 text-xs leading-snug">
+                                        Desempenho no Simulado<br>
+                                        <span class="text-gray-400">ENEM 2025</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <span class="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded font-medium">Misto</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-semibold">Confirmado</span>
+                                    </td>
+                                    <td class="px-4 py-3.5">
+                                        <button onclick="openDetailModal(this)" class="text-gray-400 hover:text-blue-500 transition p-1">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Empty state -->
+                                <tr id="emptyState" class="hidden">
+                                    <td colspan="7" class="px-4 py-12 text-center text-gray-400">
+                                        <i class="fas fa-search text-3xl mb-3 block opacity-30"></i>
+                                        <p class="text-sm">Nenhum agendamento encontrado para os filtros selecionados.</p>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right sidebar: distribution + quick links -->
+            <div class="flex flex-col gap-5">
+
+                <!-- Distribution by tipo -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                    <h3 class="font-bold text-sm text-gray-700 mb-4">Por Tipo de Atendimento</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-gray-600 font-medium">Cronograma</span>
+                                <span class="text-gray-500 font-bold">10</span>
+                            </div>
+                            <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-500 rounded-full" style="width: 42%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-gray-600 font-medium">Dúvidas Vestibulares</span>
+                                <span class="text-gray-500 font-bold">8</span>
+                            </div>
+                            <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-purple-500 rounded-full" style="width: 33%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-gray-600 font-medium">Desempenho Simulado</span>
+                                <span class="text-gray-500 font-bold">4</span>
+                            </div>
+                            <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-emerald-500 rounded-full" style="width: 17%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-gray-600 font-medium">Outros</span>
+                                <span class="text-gray-500 font-bold">2</span>
+                            </div>
+                            <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-gray-400 rounded-full" style="width: 8%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Distribution by docente -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                    <h3 class="font-bold text-sm text-gray-700 mb-4">Por Docente</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-7 h-7 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">R</div>
+                                <span class="text-sm text-gray-700">Rafa</span>
+                            </div>
+                            <span class="font-bold text-sm text-gray-800">11</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-7 h-7 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-bold">L</div>
+                                <span class="text-sm text-gray-700">Letícia</span>
+                            </div>
+                            <span class="font-bold text-sm text-gray-800">7</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-7 h-7 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-xs font-bold">H</div>
+                                <span class="text-sm text-gray-700">Heloísa</span>
+                            </div>
+                            <span class="font-bold text-sm text-gray-800">5</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-7 h-7 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-xs font-bold">La</div>
+                                <span class="text-sm text-gray-700">Larissa</span>
+                            </div>
+                            <span class="font-bold text-sm text-gray-800">1</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Distribution by modalidade -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                    <h3 class="font-bold text-sm text-gray-700 mb-4">Por Modalidade</h3>
+                    <div class="space-y-2.5">
+                        <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
+                                <span class="text-gray-600">Online</span>
+                            </div>
+                            <span class="font-bold text-gray-800">15</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-2 h-2 rounded-full bg-purple-500 inline-block"></span>
+                                <span class="text-gray-600">Misto</span>
+                            </div>
+                            <span class="font-bold text-gray-800">6</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-2 h-2 rounded-full bg-blue-500 inline-block"></span>
+                                <span class="text-gray-600">Presencial</span>
+                            </div>
+                            <span class="font-bold text-gray-800">3</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de espera -->
+                <div class="bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl shadow-lg text-white p-5">
+                    <h3 class="font-bold text-sm mb-1 flex items-center">
+                        <i class="fas fa-list-ul mr-2"></i> Lista de Espera
+                    </h3>
+                    <p class="text-blue-200 text-xs mb-3">Alunos aguardando horário disponível.</p>
+                    <div class="space-y-2 mb-4">
+                        <div class="bg-white/10 rounded-lg px-3 py-2 text-xs">
+                            <p class="font-semibold">Pedro A.</p>
+                            <p class="text-blue-200">Noturno · @pedro.a</p>
+                        </div>
+                        <div class="bg-white/10 rounded-lg px-3 py-2 text-xs">
+                            <p class="font-semibold">Lucas F.</p>
+                            <p class="text-blue-200">Vespertino · @lucas.f</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-blue-300 text-center">2 na fila de espera</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="detailModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden transform transition-all scale-95 opacity-0 duration-300" id="detailModalContent">
+            <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+                <h3 class="font-bold text-base text-gray-900">Ações do Agendamento</h3>
+                <button onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-4 space-y-2">
+                <button class="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-emerald-50 text-left transition group">
+                    <i class="fas fa-check-circle text-emerald-500 w-5 text-center"></i>
+                    <span class="text-sm font-semibold text-gray-700 group-hover:text-emerald-700">Marcar como Realizado</span>
+                </button>
+                <button class="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-yellow-50 text-left transition group">
+                    <i class="fas fa-user-times text-yellow-500 w-5 text-center"></i>
+                    <span class="text-sm font-semibold text-gray-700 group-hover:text-yellow-700">Registrar Falta</span>
+                </button>
+                <button class="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-blue-50 text-left transition group">
+                    <i class="fab fa-telegram-plane text-blue-500 w-5 text-center"></i>
+                    <span class="text-sm font-semibold text-gray-700 group-hover:text-blue-700">Enviar Lembrete Telegram</span>
+                </button>
+                <div class="border-t border-gray-100 pt-2">
+                    <button onclick="closeDetailModal()" class="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-red-50 text-left transition group">
+                        <i class="fas fa-times-circle text-red-400 w-5 text-center"></i>
+                        <span class="text-sm font-semibold text-gray-700 group-hover:text-red-600">Cancelar Agendamento</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-8 right-8 bg-gray-900 text-white px-6 py-3.5 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-500 z-50 flex items-center space-x-3 border border-white/10">
+        <div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-check text-xs"></i>
+        </div>
+        <span class="font-medium" id="toastMsg">Relatório gerado!</span>
+    </div>
+
+    <script>
+        // --- Table filters ---
+        function applyTableFilters() {
+            const searchAluno   = document.getElementById('filterAluno').value.toLowerCase();
+            const filterDocente = document.getElementById('filterDocente').value.toLowerCase();
+            const filterStatus  = document.getElementById('filterStatus').value.toLowerCase();
+
+            const rows = document.querySelectorAll('.table-row');
+            let visible = 0;
+
+            rows.forEach(row => {
+                const aluno   = (row.dataset.aluno || '').toLowerCase();
+                const docente = (row.dataset.docente || '').toLowerCase();
+                const status  = (row.dataset.status || '').toLowerCase();
+
+                const matchAluno   = !searchAluno   || aluno.includes(searchAluno);
+                const matchDocente = !filterDocente || docente.includes(filterDocente);
+                const matchStatus  = !filterStatus  || status === filterStatus;
+
+                const show = matchAluno && matchDocente && matchStatus;
+                row.classList.toggle('hidden', !show);
+                if (show) visible++;
+            });
+
+            document.getElementById('tableCount').textContent = visible;
+            document.getElementById('emptyState').classList.toggle('hidden', visible > 0);
+        }
+
+        // --- Detail modal ---
+        const detailModal = document.getElementById('detailModal');
+        const detailModalContent = document.getElementById('detailModalContent');
+
+        function openDetailModal(btn) {
+            detailModal.classList.remove('hidden');
+            setTimeout(() => {
+                detailModalContent.classList.remove('scale-95', 'opacity-0');
+                detailModalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeDetailModal() {
+            detailModalContent.classList.remove('scale-100', 'opacity-100');
+            detailModalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => detailModal.classList.add('hidden'), 300);
+        }
+
+        detailModal.addEventListener('click', e => { if (e.target === detailModal) closeDetailModal(); });
+
+        // --- Export report ---
+        function exportReport() {
+            showToast('Relatório de Abril 2026 exportado!');
+        }
+
+        function showToast(msg) {
+            document.getElementById('toastMsg').textContent = msg;
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3500);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+### Health check
+GET http://localhost:3000/
+
+###
+
+### Get student 1
+GET http://localhost:3000/api/alunos/1
+
+###
+
+### Get student 1 agendamentos
+GET http://localhost:3000/api/alunos/1/agendamentos
+
+###
+
+### Get all available slots
+GET http://localhost:3000/api/slots
+
+###
+
+### Create a new agendamento
+POST http://localhost:3000/api/agendamentos
+Content-Type: application/json
+
+{
+  "alunoId": 3,
+  "slotId": 3,
+  "tipoAtendimento": "cronograma",
+  "especificacao": "Noturno"
+}
+
+###
+
+### Try to book the same slot again (should return 409)
+POST http://localhost:3000/api/agendamentos
+Content-Type: application/json
+
+{
+  "alunoId": 1,
+  "slotId": 3,
+  "tipoAtendimento": "simulado",
+  "especificacao": "FUVEST"
+}
+
+### Cancel agendamento 1
+PATCH http://localhost:3000/api/agendamentos/1/cancelar
+
+###
+
+### Try to cancel it again (should return 409)
+PATCH http://localhost:3000/api/agendamentos/1/cancelar
+
+### Join waiting list
+POST http://localhost:3000/api/lista-espera
+Content-Type: application/json
+
+{
+  "alunoId": 2,
+  "turnoPreferencial": "Vespertino",
+  "diasPreferencia": "Segunda ou Terca"
+}
+
+###
+
+### Try to join again (should return 409)
+POST http://localhost:3000/api/lista-espera
+Content-Type: application/json
+
+{
+  "alunoId": 2,
+  "turnoPreferencial": "Vespertino"
+}
+
+###
+
+### Leave waiting list
+DELETE http://localhost:3000/api/lista-espera/1
+
+### Join waiting list
+POST http://localhost:3000/api/lista-espera
+Content-Type: application/json
+
+{
+  "alunoId": 2,
+  "turnoPreferencial": "Vespertino",
+  "diasPreferencia": "Segunda ou Terca"
+}
