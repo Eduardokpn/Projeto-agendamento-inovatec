@@ -196,6 +196,29 @@ const listaEspera = [
   }
 ]
 
+// TABLE: disponibilidade
+// Represents a docente's recurring weekly availability.
+// id         → unique identifier
+// docenteId  → references the docente
+// diaSemana  → day of week: 1=Segunda, 2=Terça, 3=Quarta, 4=Quinta, 5=Sexta
+// horario    → start time in HH:MM format (slots are always 30 min)
+// modalidade → format: 'Online', 'Presencial' or 'Misto'
+const disponibilidade = [
+  { id: 1, docenteId: 1, diaSemana: 2, horario: '09:00', modalidade: 'Online' },
+  { id: 2, docenteId: 1, diaSemana: 4, horario: '14:00', modalidade: 'Misto' },
+  { id: 3, docenteId: 1, diaSemana: 5, horario: '12:30', modalidade: 'Online' }
+]
+
+// TABLE: excecoes
+// Represents specific dates where a docente is NOT available (overrides disponibilidade).
+// id        → unique identifier
+// docenteId → references the docente
+// data      → blocked date in YYYY-MM-DD format
+// motivo    → optional reason for absence
+const excecoes = [
+  { id: 1, docenteId: 1, data: '2026-05-12', motivo: 'Feriado' }
+]
+
 // EXPORTS
 // Makes all tables available to other files in the project.
 // Any file that needs data does: const db = require('./placeholder')
@@ -205,5 +228,7 @@ module.exports = {
   alunos,
   slots,
   agendamentos,
-  listaEspera
+  listaEspera,
+  disponibilidade,
+  excecoes
 }

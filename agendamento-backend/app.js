@@ -36,6 +36,10 @@ app.use('/api/lista-espera', listaEsperaRouter)
 const adminRouter = require('./src/routes/admin')
 app.use('/api/admin', adminRouter)
 
+//Routes Docentes
+const docentesRouter = require('./src/routes/docentes')
+app.use('/api/docentes', docentesRouter)
+
 // HEALTH CHECK
 // A simple test route to confirm the server is running
 app.get('/', (req, res) => {
